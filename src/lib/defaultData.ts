@@ -148,104 +148,116 @@ export const defaultSpellLists: SpellList[] = [
         level: 1,
         spells: [
           { id: 'd1_1', name: 'Allure' }, { id: 'd1_2', name: 'Angelic Choir' }, { id: 'd1_3', name: 'Bane-Rune' },
-          { id: 'd1_4', name: 'Call of the Wolf' }, { id: 'd1_5', name: 'Counterspell' }, { id: 'd1_6', name: 'Cure Light Injury*' },
-          { id: 'd1_7', name: 'Delay Disease' }, { id: 'd1_8', name: 'Destroy Dead' }, { id: 'd1_9', name: 'Discern Evil*' },
-          { id: 'd1_10', name: 'Discern Gist' }, { id: 'd1_11', name: 'Discern Magic' }, { id: 'd1_12', name: 'Discern Poison' },
-          { id: 'd1_13', name: 'Faithful Companion' }, { id: 'd1_14', name: 'Frighten Beast' }, { id: 'd1_15', name: 'Holy Circle*' },
-          { id: 'd1_16', name: 'Illumination*' }, { id: 'd1_17', name: 'Infuriate Beast' }, { id: 'd1_18', name: 'Kindle Flame' },
-          { id: 'd1_19', name: 'Locate Animal or Plant' }, { id: 'd1_20', name: 'Pass Without Trace' }, { id: 'd1_21', name: 'Predict Weather' },
-          { id: 'd1_22', name: 'Purify Food and Water*' }, { id: 'd1_23', name: 'Remove Fear*' }, { id: 'd1_24', name: 'Salving Rest' },
-          { id: 'd1_25', name: 'Sanctuary' }, { id: 'd1_26', name: 'Seal Portal' }, { id: 'd1_27', name: 'Shatter Blade' },
-          { id: 'd1_28', name: 'Sling Stone' }, { id: 'd1_29', name: 'Unliving Puppet' }, { id: 'd1_30', name: 'Word of Command' }
+           { id: 'd1_4', name: 'Call of the Wolf' }, { id: 'd1_5', name: 'Counterspell' }, { id: 'd1_6', name: 'Cure Light Injury' },
+           { id: 'd1_7', name: 'Cause Light Injury' }, { id: 'd1_8', name: 'Delay Disease' }, { id: 'd1_9', name: 'Destroy Dead' },
+           { id: 'd1_10', name: 'Discern Evil' }, { id: 'd1_11', name: 'Discern Good' }, { id: 'd1_12', name: 'Discern Gist' },
+           { id: 'd1_13', name: 'Discern Magic' }, { id: 'd1_14', name: 'Discern Poison' }, { id: 'd1_15', name: 'Faithful Companion' },
+           { id: 'd1_16', name: 'Frighten Beast' }, { id: 'd1_17', name: 'Holy Circle' }, { id: 'd1_18', name: 'Unholy Circle' },
+           { id: 'd1_19', name: 'Illumination' }, { id: 'd1_20', name: 'Tenebrosity' }, { id: 'd1_21', name: 'Infuriate Beast' },
+           { id: 'd1_22', name: 'Kindle Flame' }, { id: 'd1_23', name: 'Locate Animal or Plant' }, { id: 'd1_24', name: 'Pass Without Trace' },
+           { id: 'd1_25', name: 'Predict Weather' }, { id: 'd1_26', name: 'Purify Food and Water' }, { id: 'd1_27', name: 'Putrefy Food and Water' },
+           { id: 'd1_28', name: 'Remove Fear' }, { id: 'd1_29', name: 'Cause Fear' }, { id: 'd1_30', name: 'Salving Rest' },
+           { id: 'd1_31', name: 'Sanctuary' }, { id: 'd1_32', name: 'Seal Portal' }, { id: 'd1_33', name: 'Shatter Blade' },
+           { id: 'd1_34', name: 'Sling Stone' }, { id: 'd1_35', name: 'Unliving Puppet' }, { id: 'd1_36', name: 'Word of Command' }
         ]
       },
       {
         level: 2,
         spells: [
           { id: 'd2_1', name: 'Augury' }, { id: 'd2_2', name: 'Beguile Humanoid' }, { id: 'd2_3', name: 'Bewitch Beast' },
-          { id: 'd2_4', name: 'Call of the Wolf Pack' }, { id: 'd2_5', name: 'Choking Grip' }, { id: 'd2_6', name: 'Circling Winds' },
-          { id: 'd2_7', name: 'Cure Moderate Injury*' }, { id: 'd2_8', name: 'Dark Whisper' }, { id: 'd2_9', name: 'Deathless Minion' },
-          { id: 'd2_10', name: 'Delay Poison' }, { id: 'd2_11', name: 'Discern Bewitchment*' }, { id: 'd2_12', name: 'Divine Armor' },
-          { id: 'd2_13', name: 'Divine Grace' }, { id: 'd2_14', name: 'Dominate Beasts' }, { id: 'd2_15', name: 'Energy Protection' },
-          { id: 'd2_16', name: 'Halt Humanoids' }, { id: 'd2_17', name: 'Holy Blessing*' }, { id: 'd2_18', name: 'Holy Chant' },
-          { id: 'd2_19', name: 'Magic Lock' }, { id: 'd2_20', name: 'Necromantic Potence' }, { id: 'd2_21', name: 'Noiselessness' },
-          { id: 'd2_22', name: 'Physical Protection' }, { id: 'd2_23', name: 'Righteous Wrath' }, { id: 'd2_24', name: 'Shimmer' },
-          { id: 'd2_25', name: 'Slicing Blow' }, { id: 'd2_26', name: 'Slumber' }, { id: 'd2_27', name: 'Speak with Beasts' },
-          { id: 'd2_28', name: 'Spiritual Weapon' }, { id: 'd2_29', name: 'Swift Sword' }, { id: 'd2_30', name: 'Transform Beast' }
+           { id: 'd2_4', name: 'Call of the Wolf Pack' }, { id: 'd2_5', name: 'Choking Grip' }, { id: 'd2_6', name: 'Circling Winds' },
+           { id: 'd2_7', name: 'Cure Moderate Injury' }, { id: 'd2_8', name: 'Cause Moderate Injury' }, { id: 'd2_9', name: 'Dark Whisper' },
+           { id: 'd2_10', name: 'Deathless Minion' }, { id: 'd2_11', name: 'Delay Poison' }, { id: 'd2_12', name: 'Discern Bewitchment' },
+           { id: 'd2_13', name: 'Indiscernible Bewitchment' }, { id: 'd2_14', name: 'Divine Armor' }, { id: 'd2_15', name: 'Divine Grace' },
+           { id: 'd2_16', name: 'Dominate Beasts' }, { id: 'd2_17', name: 'Energy Protection' }, { id: 'd2_18', name: 'Halt Humanoids' },
+           { id: 'd2_19', name: 'Holy Blessing' }, { id: 'd2_20', name: 'Unholy Blessing' }, { id: 'd2_21', name: 'Holy Chant' },
+           { id: 'd2_22', name: 'Magic Lock' }, { id: 'd2_23', name: 'Necromantic Potence' }, { id: 'd2_24', name: 'Noiselessness' },
+           { id: 'd2_25', name: 'Physical Protection' }, { id: 'd2_26', name: 'Righteous Wrath' }, { id: 'd2_27', name: 'Shimmer' },
+           { id: 'd2_28', name: 'Slicing Blow' }, { id: 'd2_29', name: 'Slumber' }, { id: 'd2_30', name: 'Speak with Beasts' },
+           { id: 'd2_31', name: 'Spiritual Weapon' }, { id: 'd2_32', name: 'Swift Sword' }, { id: 'd2_33', name: 'Transform Beast' }
         ]
       },
       {
         level: 3,
         spells: [
           { id: 'd3_1', name: 'Avian Messenger' }, { id: 'd3_2', name: 'Bewitch Humanoid' }, { id: 'd3_3', name: 'Call of the Wild Bear' },
-          { id: 'd3_4', name: 'Clairaudiency' }, { id: 'd3_5', name: 'Clairvoyancy' }, { id: 'd3_6', name: 'Cure Blindness*' },
-          { id: 'd3_7', name: 'Cure Disease*' }, { id: 'd3_8', name: 'Cure Major Injury*' }, { id: 'd3_9', name: 'Deflect Ordinary Missiles' },
-          { id: 'd3_10', name: 'Discern Curse*' }, { id: 'd3_11', name: 'Discern Invisible' }, { id: 'd3_12', name: 'Dispel Magic' },
-          { id: 'd3_13', name: 'Divine Protection' }, { id: 'd3_14', name: 'Growth, Beast' }, { id: 'd3_15', name: 'Holy Circle, Sustained*' },
-          { id: 'd3_16', name: 'Holy Prayer' }, { id: 'd3_17', name: 'Illumination, Perpetual*' }, { id: 'd3_18', name: 'Invulnerability to Evil*' },
-          { id: 'd3_19', name: 'Lightning Strike' }, { id: 'd3_20', name: 'Phantasmal Figment' }, { id: 'd3_21', name: 'Remove Curse*' },
-          { id: 'd3_22', name: 'Rune of Warding' }, { id: 'd3_23', name: 'Speak with Dead' }, { id: 'd3_24', name: 'Spellward' },
-          { id: 'd3_25', name: 'Strengthen the Unliving' }, { id: 'd3_26', name: 'Striking' }, { id: 'd3_27', name: 'Swift Sword, Sustained' },
-          { id: 'd3_28', name: 'Water Breathing' }, { id: 'd3_29', name: 'Water Walking' }, { id: 'd3_30', name: 'Winged Flight' }
+           { id: 'd3_4', name: 'Clairaudiency' }, { id: 'd3_5', name: 'Clairvoyancy' }, { id: 'd3_6', name: 'Cure Blindness' },
+           { id: 'd3_7', name: 'Cause Blindness' }, { id: 'd3_8', name: 'Cure Disease' }, { id: 'd3_9', name: 'Cause Disease' },
+           { id: 'd3_10', name: 'Cure Major Injury' }, { id: 'd3_11', name: 'Cause Major Injury' }, { id: 'd3_12', name: 'Deflect Ordinary Missiles' },
+           { id: 'd3_13', name: 'Discern Curse' }, { id: 'd3_14', name: 'Indiscernible Curse' }, { id: 'd3_15', name: 'Discern Invisible' },
+           { id: 'd3_16', name: 'Dispel Magic' }, { id: 'd3_17', name: 'Divine Protection' }, { id: 'd3_18', name: 'Growth, Beast' },
+           { id: 'd3_19', name: 'Holy Circle, Sustained' }, { id: 'd3_20', name: 'Unholy Circle, Sustained' }, { id: 'd3_21', name: 'Holy Prayer' },
+           { id: 'd3_22', name: 'Illumination, Perpetual' }, { id: 'd3_23', name: 'Tenebrosity, Perpetual' }, { id: 'd3_24', name: 'Invulnerability to Evil' },
+           { id: 'd3_25', name: 'Invulnerability to Good' }, { id: 'd3_26', name: 'Lightning Strike' }, { id: 'd3_27', name: 'Phantasmal Figment' },
+           { id: 'd3_28', name: 'Remove Curse' }, { id: 'd3_29', name: 'Bestow Curse' }, { id: 'd3_30', name: 'Rune of Warding' },
+           { id: 'd3_31', name: 'Speak with Dead' }, { id: 'd3_32', name: 'Spellward' }, { id: 'd3_33', name: 'Strengthen the Unliving' },
+           { id: 'd3_34', name: 'Striking' }, { id: 'd3_35', name: 'Swift Sword, Sustained' }, { id: 'd3_36', name: 'Water Breathing' },
+           { id: 'd3_37', name: 'Water Walking' }, { id: 'd3_38', name: 'Winged Flight' }
         ]
       },
       {
         level: 4,
         spells: [
           { id: 'd4_1', name: 'Angelic Aura' }, { id: 'd4_2', name: 'Call of the Galloping Herd' }, { id: 'd4_3', name: 'Call of the Regal Pride' },
-          { id: 'd4_4', name: 'Crafting' }, { id: 'd4_5', name: 'Create Water' }, { id: 'd4_6', name: 'Cure Serious Injury*' },
-          { id: 'd4_7', name: 'Death Ward' }, { id: 'd4_8', name: 'Dismember' }, { id: 'd4_9', name: 'Divination' },
-          { id: 'd4_10', name: 'Energy Invulnerability' }, { id: 'd4_11', name: 'Gale of Wind' }, { id: 'd4_12', name: 'Growth*' },
-          { id: 'd4_13', name: 'Inaudibility' }, { id: 'd4_14', name: 'Indiscernibility' }, { id: 'd4_15', name: 'Inspire Awe*' },
-          { id: 'd4_16', name: 'Invisibility' }, { id: 'd4_17', name: 'Lightless Vision' }, { id: 'd4_18', name: 'Neutralize Poison*' },
-          { id: 'd4_19', name: 'Physical Invulnerability' }, { id: 'd4_20', name: 'Protection from Temperature' }, { id: 'd4_21', name: 'Repair Disfigurement & Disability*' },
-          { id: 'd4_22', name: 'Skinchange' }, { id: 'd4_23', name: 'Smite Undead*' }, { id: 'd4_24', name: 'Snakes to Staffs*' },
-          { id: 'd4_25', name: 'Speak with Plants' }, { id: 'd4_26', name: 'Spellward Other' }, { id: 'd4_27', name: 'Sphere of Invulnerability, Lesser' },
-          { id: 'd4_28', name: 'Spirit of Healing' }, { id: 'd4_29', name: 'Sunflare' }, { id: 'd4_30', name: 'Tongues' }
+           { id: 'd4_4', name: 'Crafting' }, { id: 'd4_5', name: 'Create Water' }, { id: 'd4_6', name: 'Cure Serious Injury' },
+           { id: 'd4_7', name: 'Cause Serious Injury' }, { id: 'd4_8', name: 'Death Ward' }, { id: 'd4_9', name: 'Dismember' },
+           { id: 'd4_10', name: 'Divination' }, { id: 'd4_11', name: 'Energy Invulnerability' }, { id: 'd4_12', name: 'Gale of Wind' },
+           { id: 'd4_13', name: 'Growth' }, { id: 'd4_14', name: 'Shrinking' }, { id: 'd4_15', name: 'Inaudibility' },
+           { id: 'd4_16', name: 'Indiscernibility' }, { id: 'd4_17', name: 'Inspire Awe' }, { id: 'd4_18', name: 'Inspire Horror' },
+           { id: 'd4_19', name: 'Invisibility' }, { id: 'd4_20', name: 'Lightless Vision' }, { id: 'd4_21', name: 'Neutralize Poison' },
+           { id: 'd4_22', name: 'Poison' }, { id: 'd4_23', name: 'Physical Invulnerability' }, { id: 'd4_24', name: 'Protection from Temperature' },
+           { id: 'd4_25', name: 'Repair Disfigurement & Disability' }, { id: 'd4_26', name: 'Cause Disfigurement and Disability' }, { id: 'd4_27', name: 'Skinchange' },
+           { id: 'd4_28', name: 'Smite Undead' }, { id: 'd4_29', name: 'Animate Undead' }, { id: 'd4_30', name: 'Snakes to Staffs' },
+           { id: 'd4_31', name: 'Staffs to Snakes' }, { id: 'd4_32', name: 'Speak with Plants' }, { id: 'd4_33', name: 'Spellward Other' },
+           { id: 'd4_34', name: 'Sphere of Invulnerability, Lesser' }, { id: 'd4_35', name: 'Spirit of Healing' }, { id: 'd4_36', name: 'Sunflare' },
+           { id: 'd4_37', name: 'Tongues' }
         ]
       },
       {
         level: 5,
         spells: [
           { id: 'd5_1', name: 'Atonement' }, { id: 'd5_2', name: 'Blast Ward' }, { id: 'd5_3', name: 'Boil Blood' },
-          { id: 'd5_4', name: 'Call of the Great Cats' }, { id: 'd5_5', name: 'Communion' }, { id: 'd5_6', name: 'Cone of Fear' },
-          { id: 'd5_7', name: 'Control Winds' }, { id: 'd5_8', name: 'Create Food' }, { id: 'd5_9', name: 'Cure Critical Injury*' },
-          { id: 'd5_10', name: 'Curse of the Swine' }, { id: 'd5_11', name: 'Deflect Ordinary Weapons' }, { id: 'd5_12', name: 'Dominate Monster' },
-          { id: 'd5_13', name: 'Fate' }, { id: 'd5_14', name: 'Fiery Pillar' }, { id: 'd5_15', name: 'Giant Strength' },
-          { id: 'd5_16', name: 'Growth, Plant' }, { id: 'd5_17', name: 'Guise Self' }, { id: 'd5_18', name: 'Healing Circle' },
-          { id: 'd5_19', name: 'Lay of the Land' }, { id: 'd5_20', name: 'Locate Haunting' }, { id: 'd5_21', name: 'Restore Life and Limb*' },
-          { id: 'd5_22', name: 'Safe Travels' }, { id: 'd5_23', name: 'Scry' }, { id: 'd5_24', name: 'Spiritwalk' },
-          { id: 'd5_25', name: 'Strength of Mind*' }, { id: 'd5_26', name: 'Summon Insect Plague' }, { id: 'd5_27', name: 'Sword of Fire' },
-          { id: 'd5_28', name: 'True Seeing' }, { id: 'd5_29', name: 'Turn to Dust' }, { id: 'd5_30', name: 'Vigor' }
+           { id: 'd5_4', name: 'Call of the Great Cats' }, { id: 'd5_5', name: 'Communion' }, { id: 'd5_6', name: 'Cone of Fear' },
+           { id: 'd5_7', name: 'Control Winds' }, { id: 'd5_8', name: 'Create Food' }, { id: 'd5_9', name: 'Cure Critical Injury' },
+           { id: 'd5_10', name: 'Cause Critical Injury' }, { id: 'd5_11', name: 'Curse of the Swine' }, { id: 'd5_12', name: 'Deflect Ordinary Weapons' },
+           { id: 'd5_13', name: 'Dominate Monster' }, { id: 'd5_14', name: 'Fate' }, { id: 'd5_15', name: 'Fiery Pillar' },
+           { id: 'd5_16', name: 'Giant Strength' }, { id: 'd5_17', name: 'Growth, Plant' }, { id: 'd5_18', name: 'Guise Self' },
+           { id: 'd5_19', name: 'Healing Circle' }, { id: 'd5_20', name: 'Lay of the Land' }, { id: 'd5_21', name: 'Locate Haunting' },
+           { id: 'd5_22', name: 'Restore Life and Limb' }, { id: 'd5_23', name: 'Extinguish Life' }, { id: 'd5_24', name: 'Safe Travels' },
+           { id: 'd5_25', name: 'Scry' }, { id: 'd5_26', name: 'Spiritwalk' }, { id: 'd5_27', name: 'Strength of Mind' },
+           { id: 'd5_28', name: 'Weakness of Mind' }, { id: 'd5_29', name: 'Summon Insect Plague' }, { id: 'd5_30', name: 'Sword of Fire' },
+           { id: 'd5_31', name: 'True Seeing' }, { id: 'd5_32', name: 'Turn to Dust' }, { id: 'd5_33', name: 'Vigor' }
         ]
       },
       {
         level: 6,
         spells: [
           { id: 'd6_1', name: 'Anti-Magic Sphere' }, { id: 'd6_2', name: 'Arrows of the Sun' }, { id: 'd6_3', name: 'Banner of Invincibility' },
-          { id: 'd6_4', name: 'Barrier of Blades' }, { id: 'd6_5', name: 'Bath of the Goddess' }, { id: 'd6_6', name: 'Bewitch Monster' },
-          { id: 'd6_7', name: 'Blast Ward, Greater' }, { id: 'd6_8', name: 'Call of the Ancient Tusk' }, { id: 'd6_9', name: 'Call of the Aerophract Steeds' },
-          { id: 'd6_10', name: 'Clairaudiency, Greater' }, { id: 'd6_11', name: 'Clairvoyancy, Greater' }, { id: 'd6_12', name: 'Dispel Evil*' },
-          { id: 'd6_13', name: 'Fillet and Serve' }, { id: 'd6_14', name: 'Flesh to Ash' }, { id: 'd6_15', name: 'Guise Other' },
-          { id: 'd6_16', name: 'Hidden Host' }, { id: 'd6_17', name: 'Home Ward' }, { id: 'd6_18', name: 'Illusory Terrain' },
-          { id: 'd6_19', name: 'Level Water' }, { id: 'd6_20', name: 'Locate Place of Power' }, { id: 'd6_21', name: 'Phoenix Aura' },
-          { id: 'd6_22', name: 'Prophetic Dream' }, { id: 'd6_23', name: 'Quest' }, { id: 'd6_24', name: 'Salvific Rain' },
-          { id: 'd6_25', name: 'Slumber, Deep' }, { id: 'd6_26', name: 'Spectral Figment' }, { id: 'd6_27', name: 'Spellwarded Zone' },
-          { id: 'd6_28', name: 'Sphere of Invulnerability, Greater' }, { id: 'd6_29', name: 'Summon Weather' }, { id: 'd6_30', name: 'Summon Winged Herald' }
+           { id: 'd6_4', name: 'Barrier of Blades' }, { id: 'd6_5', name: 'Bath of the Goddess' }, { id: 'd6_6', name: 'Bewitch Monster' },
+           { id: 'd6_7', name: 'Blast Ward, Greater' }, { id: 'd6_8', name: 'Call of the Ancient Tusk' }, { id: 'd6_9', name: 'Call of the Aerophract Steeds' },
+           { id: 'd6_10', name: 'Clairaudiency, Greater' }, { id: 'd6_11', name: 'Clairvoyancy, Greater' }, { id: 'd6_12', name: 'Dispel Evil' },
+           { id: 'd6_13', name: 'Dispel Good' }, { id: 'd6_14', name: 'Fillet and Serve' }, { id: 'd6_15', name: 'Flesh to Ash' },
+           { id: 'd6_16', name: 'Guise Other' }, { id: 'd6_17', name: 'Hidden Host' }, { id: 'd6_18', name: 'Home Ward' },
+           { id: 'd6_19', name: 'Illusory Terrain' }, { id: 'd6_20', name: 'Level Water' }, { id: 'd6_21', name: 'Locate Place of Power' },
+           { id: 'd6_22', name: 'Phoenix Aura' }, { id: 'd6_23', name: 'Prophetic Dream' }, { id: 'd6_24', name: 'Quest' },
+           { id: 'd6_25', name: 'Salvific Rain' }, { id: 'd6_26', name: 'Slumber, Deep' }, { id: 'd6_27', name: 'Spectral Figment' },
+           { id: 'd6_28', name: 'Spellwarded Zone' }, { id: 'd6_29', name: 'Sphere of Invulnerability, Greater' }, { id: 'd6_30', name: 'Summon Weather' },
+           { id: 'd6_31', name: 'Summon Winged Herald' }
         ]
       },
       {
         level: 7,
         spells: [
-          { id: 'd7_1', name: 'Harvest*' }, { id: 'd7_2', name: 'Magic Mushrooms' }, { id: 'd7_3', name: 'Ranine Rain' },
-          { id: 'd7_4', name: 'Seven-League Stride' }, { id: 'd7_5', name: 'Spawn of the Deep' }, { id: 'd7_6', name: 'Youthfulness' }
+          { id: 'd7_1', name: 'Harvest' }, { id: 'd7_2', name: 'Ravage' }, { id: 'd7_3', name: 'Magic Mushrooms' },
+           { id: 'd7_4', name: 'Ranine Rain' }, { id: 'd7_5', name: 'Seven-League Stride' }, { id: 'd7_6', name: 'Spawn of the Deep' },
+           { id: 'd7_7', name: 'Youthfulness' }
         ]
       },
       {
         level: 8,
         spells: [
-          { id: 'd8_1', name: 'Resurrection*' }, { id: 'd8_2', name: 'Permanency' }, { id: 'd8_3', name: 'Consume Power' },
-          { id: 'd8_4', name: 'Consonant Transit' }
+          { id: 'd8_1', name: 'Resurrection' }, { id: 'd8_2', name: 'Destruction' }, { id: 'd8_3', name: 'Permanency' },
+           { id: 'd8_4', name: 'Consume Power' }, { id: 'd8_5', name: 'Consonant Transit' }
         ]
       },
       {
@@ -257,4 +269,3 @@ export const defaultSpellLists: SpellList[] = [
     ]
   }
 ];
-
