@@ -149,11 +149,17 @@ export interface Step2_3Result {
   spellLevels: number[];
 }
 
-export const generateStep2_3 = (initialLevels: number): Step2_3Result => {
-  let remaining = initialLevels;
+export const generateStep2_3 = (initialLevels: number, isRitual: boolean = false): Step2_3Result => {
   const spellLevels: number[] = [];
   const logs: string[] = [];
 
+  if (isRitual) {
+    spellLevels.push(initialLevels);
+    logs.push(`Step 2.3: Ritual spell detected. The scroll contains a single spell of level ${initialLevels}.`);
+    return { logs, spellLevels };
+  }
+
+  let remaining = initialLevels;
   while (remaining > 0) {
     const roll = rollDie(100);
     let spellLevel = 1;

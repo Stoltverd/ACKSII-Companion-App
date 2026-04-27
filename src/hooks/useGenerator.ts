@@ -65,11 +65,12 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       newLog = newLog.concat(step2_2.logs);
 
       // Step 2.3
-      const step2_3 = generateStep2_3(step1.totalLevels);
+      const isRitual = step1.type === 'Ritual Spell';
+      const step2_3 = generateStep2_3(step1.totalLevels, isRitual);
       newLog = newLog.concat(step2_3.logs);
       
       // Step 2.4
-      const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels, step1.type === 'Ritual Spell');
+      const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels, isRitual);
       newLog = newLog.concat(step2_4.logs);
 
       const finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
