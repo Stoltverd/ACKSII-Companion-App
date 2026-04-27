@@ -51,6 +51,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
           isGenerating: false,
           log: newLog,
           isFinished: true,
+          finalOutput: step1.message,
         });
         return;
       }
