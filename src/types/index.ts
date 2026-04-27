@@ -1,0 +1,45 @@
+export type MagicType = 'Arcane' | 'Divine';
+
+export interface Language {
+  id: string;
+  name: string;
+  isDivineOnly: boolean;
+  rangeMin: number;
+  rangeMax: number;
+}
+
+export interface Spell {
+  id: string;
+  name: string;
+}
+
+export interface SpellListLevel {
+  level: number;
+  spells: Spell[];
+}
+
+export interface SpellList {
+  id: string;
+  name: string;
+  magicType: MagicType;
+  levels: SpellListLevel[];
+}
+
+export interface SavedScroll {
+  id: string;
+  dateSaved: number;
+  magicType: MagicType;
+  language: string;
+  totalLevels: number;
+  spells: {
+    level: number;
+    name: string;
+  }[];
+  generatedText: string;
+}
+
+export interface AppState {
+  languages: Language[];
+  spellLists: SpellList[];
+  savedScrolls: SavedScroll[];
+}
