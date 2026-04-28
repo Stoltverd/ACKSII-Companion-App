@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../AppContext';
 import { useGenerator } from '../hooks/useGenerator';
+import { useConfirm } from '../hooks/useConfirm';
 import { Lock, Unlock, Save } from 'lucide-react';
 import { MagicType } from '../types';
 
 export default function GeneratorView() {
   const { languages, spellLists, saveScroll } = useAppContext();
-  const { state, lockedMagicType, setLockedMagicType, lockedLanguage, setLockedLanguage, startGeneration } = useGenerator(languages, spellLists);
+  const { state, lockedMagicType, setLockedMagicType, lockedLanguage, setLockedLanguage, lockedLevels, setLockedLevels, startGeneration } = useGenerator(languages, spellLists);
+  const { alert: showAlert } = useConfirm();
   
   useEffect(() => {
     // If not locked or ID is invalid, pick default to avoid empty selects
@@ -24,11 +26,15 @@ export default function GeneratorView() {
         language: state.resultData.language,
         totalLevels: state.resultData.totalLevels,
         spells: state.resultData.spells,
-        generatedText: state.finalOutput
+        generatedText: state.finalOutput,
+        spellListName: state.resultData.spellListName
       });
-      alert('Scroll saved successfully! You can view it in the Saved tab.');
+      showAlert({ title: 'Success', message: 'Scroll saved successfully! You can view it in the Saved tab.' });
     }
   };
+
+  const availableMagicTypes = Array.from(new Set(spellLists.map(list => list.magicType)));
+  const magicTypeCount = availableMagicTypes.length;
 
   return (
     <div className="space-y-6">
@@ -60,12 +66,12 @@ export default function GeneratorView() {
                   </button>
                 </div>
                 {lockedMagicType.isLocked && (
-                  <div className="flex bg-app rounded-lg p-1 border border-app">
-                    {(['Arcane', 'Divine'] as MagicType[]).map((type) => (
+                  <div className="flex bg-app rounded-lg p-1 border border-app flex-wrap gap-1">
+                    {availableMagicTypes.map((type) => (
                       <button
                         key={type}
                         onClick={() => setLockedMagicType(prev => ({ ...prev, value: type }))}
-                        className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                        className={`flex-1 py-1.5 px-2 text-sm font-medium rounded-md transition-colors ${
                           lockedMagicType.value === type 
                             ? 'bg-surface shadow-sm text-main' 
                             : 'text-muted hover:text-main'
@@ -77,7 +83,7 @@ export default function GeneratorView() {
                   </div>
                 )}
                 {!lockedMagicType.isLocked && (
-                  <p className="text-xs text-muted">A standard d6 roll will determine Arcane (1-3) or Divine (4-6).</p>
+                  <p className="text-xs text-muted">A d{magicTypeCount} roll will determine the magic type.</p>
                 )}
               </div>
 
@@ -109,13 +115,71 @@ export default function GeneratorView() {
                   </select>
                 )}
                 {!lockedLanguage.isLocked && (
-                  <p className="text-xs text-muted">A standard d100 roll will determine the language based on your custom language tables.</p>
+                  <p className="text-xs text-muted">A d100 roll will determine the language based on your language tables.</p>
+                )}
+              </div>
+
+              {/* Spell Levels Toggle */}
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-main">Total Spell Levels</label>
+                  <button 
+                    onClick={() => setLockedLevels(prev => ({ ...prev, isLocked: !prev.isLocked }))}
+                    className={`flex items-center space-x-1 text-xs font-medium px-2 py-1 rounded transition-colors ${
+                      lockedLevels.isLocked ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {lockedLevels.isLocked ? <Lock size={14} className="mr-1" /> : <Unlock size={14} className="mr-1" />}
+                    {lockedLevels.isLocked ? 'Locked' : 'Randomize'}
+                  </button>
+                </div>
+                {lockedLevels.isLocked && (
+                  <input
+                    type="number"
+                    min="1"
+                    max="24"
+                    value={lockedLevels.value}
+                    onChange={(e) => setLockedLevels(prev => ({ ...prev, value: parseInt(e.target.value) || 1 }))}
+                    className="w-full bg-app border border-app text-main rounded-lg px-3 py-2 text-sm outline-none focus:border-accent font-medium"
+                  />
+                )}
+                {!lockedLevels.isLocked && (
+                  <p className="text-xs text-muted">A d100 roll will determine total spell levels.</p>
                 )}
               </div>
             </div>
 
             <button 
-              onClick={startGeneration}
+              onClick={() => {
+                if (languages.length === 0) {
+                  showAlert({ title: 'Warning', message: "There are no languages available. Please add languages in the Customization tab first." });
+                  return;
+                }
+                if (spellLists.length === 0) {
+                  showAlert({ title: 'Warning', message: "There are no spell lists available. Please add spell lists in the Customization tab first." });
+                  return;
+                }
+                
+                let hasSpells = false;
+                for (const list of spellLists) {
+                  if (list.levels) {
+                    for (const lvl of list.levels) {
+                      if (lvl.spells && lvl.spells.length > 0) {
+                        hasSpells = true;
+                        break;
+                      }
+                    }
+                  }
+                  if (hasSpells) break;
+                }
+              
+                if (!hasSpells) {
+                  showAlert({ title: 'Warning', message: "There are no spells in any spell list. Please add spells in the Customization tab first." });
+                  return;
+                }
+              
+                startGeneration();
+              }}
               disabled={state.isGenerating}
               className="w-full py-3 bg-accent text-white rounded-xl font-medium shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center space-x-2"
             >

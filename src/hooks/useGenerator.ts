@@ -12,24 +12,33 @@ export interface GenerationState {
     language: string;
     totalLevels: number;
     spells: { level: number, name: string }[];
+    spellListName?: string;
   }
 }
 
 export function useGenerator(languages: Language[], spellLists: SpellList[]) {
+  const availableMagicTypes = Array.from(new Set(spellLists.map(list => list.magicType)));
+  const defaultMagicType = availableMagicTypes[0] || 'Arcane';
+
   const [state, setState] = useState<GenerationState>({
     isGenerating: false,
     log: [],
     isFinished: false,
   });
 
-  const [lockedMagicType, setLockedMagicType] = useState<{ isLocked: boolean, value: MagicType }>({
+  const [lockedMagicType, setLockedMagicType] = useState<{ isLocked: boolean, value: string }>({
     isLocked: false,
-    value: 'Arcane'
+    value: defaultMagicType
   });
 
   const [lockedLanguage, setLockedLanguage] = useState<{ isLocked: boolean, id: string | null }>({
     isLocked: false,
     id: null
+  });
+
+  const [lockedLevels, setLockedLevels] = useState<{ isLocked: boolean, value: number }>({
+    isLocked: false,
+    value: 1
   });
 
   const startGeneration = () => {
@@ -43,7 +52,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       let newLog: string[] = [];
 
       // Step 1
-      const step1 = generateStep1();
+      const step1 = generateStep1(lockedLevels.isLocked ? lockedLevels.value : null);
       newLog.push(step1.message);
       
       if (step1.isFinished) {
@@ -57,7 +66,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       }
       
       // Step 2.1
-      const step2_1 = generateStep2_1(lockedMagicType.isLocked ? lockedMagicType.value : null);
+      const step2_1 = generateStep2_1(lockedMagicType.isLocked ? lockedMagicType.value : null, availableMagicTypes);
       newLog.push(step2_1.message);
 
       // Step 2.2
@@ -70,7 +79,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       newLog = newLog.concat(step2_3.logs);
       
       // Step 2.4
-      const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels, isRitual);
+      const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels);
       newLog = newLog.concat(step2_4.logs);
 
       const finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
@@ -84,7 +93,8 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
           magicType: step2_1.type as MagicType,
           language: step2_2.languageName,
           totalLevels: step1.totalLevels,
-          spells: step2_4.spells.map(s => ({ level: s.level, name: s.name }))
+          spells: step2_4.spells.map(s => ({ level: s.level, name: s.name })),
+          spellListName: step2_4.spellListName
         }
       });
       
@@ -97,6 +107,8 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
     setLockedMagicType,
     lockedLanguage,
     setLockedLanguage,
+    lockedLevels,
+    setLockedLevels,
     startGeneration
   };
 }

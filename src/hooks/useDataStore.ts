@@ -16,18 +16,18 @@ export function useDataStore() {
     if (raw) {
       try {
         const parsed: AppState = JSON.parse(raw);
-        setLanguages(parsed.languages || defaultLanguages);
-        setSpellLists(parsed.spellLists || defaultSpellLists);
+        setLanguages(parsed.languages || JSON.parse(JSON.stringify(defaultLanguages)));
+        setSpellLists(parsed.spellLists || JSON.parse(JSON.stringify(defaultSpellLists)));
         setSavedScrolls(parsed.savedScrolls || []);
       } catch (e) {
         console.error("Failed to parse local storage, loading defaults", e);
-        setLanguages(defaultLanguages);
-        setSpellLists(defaultSpellLists);
+        setLanguages(JSON.parse(JSON.stringify(defaultLanguages)));
+        setSpellLists(JSON.parse(JSON.stringify(defaultSpellLists)));
         setSavedScrolls([]);
       }
     } else {
-      setLanguages(defaultLanguages);
-      setSpellLists(defaultSpellLists);
+      setLanguages(JSON.parse(JSON.stringify(defaultLanguages)));
+      setSpellLists(JSON.parse(JSON.stringify(defaultSpellLists)));
       setSavedScrolls([]);
     }
     setIsLoaded(true);
@@ -50,8 +50,8 @@ export function useDataStore() {
   };
   
   const restoreDefaults = () => {
-    setLanguages(defaultLanguages);
-    setSpellLists(defaultSpellLists);
+    setLanguages(JSON.parse(JSON.stringify(defaultLanguages)));
+    setSpellLists(JSON.parse(JSON.stringify(defaultSpellLists)));
     // don't wipe saved scrolls
   };
 

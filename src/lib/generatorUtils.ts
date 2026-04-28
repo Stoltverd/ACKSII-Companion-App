@@ -10,7 +10,17 @@ export interface Step1Result {
   ritualRoll?: number;
 }
 
-export const generateStep1 = (): Step1Result => {
+export const generateStep1 = (lockedLevels: number | null = null): Step1Result => {
+  if (lockedLevels !== null) {
+    return {
+      roll: 0,
+      type: 'Spell Scroll',
+      isSpellScroll: true,
+      totalLevels: lockedLevels,
+      isFinished: false,
+      message: 'User explicitly set total spell levels',
+    };
+  }
   const roll = rollDie(100);
   if (roll >= 1 && roll <= 10) return { roll, type: 'Creature Warding Scroll', isSpellScroll: false, totalLevels: 0, isFinished: true, message: 'Generation Ends: A Creature Warding Scroll was generated. Please consult page 146 of the Judges Journal' };
   if (roll >= 11 && roll <= 13) return { roll, type: 'Cursed Scroll', isSpellScroll: false, totalLevels: 0, isFinished: true, message: 'Generation Ends: A Cursed Scroll was generated. Please consult page 146 of the Judges Journal' };
@@ -76,7 +86,7 @@ export interface Step2_1Result {
   message: string;
 }
 
-export const generateStep2_1 = (lockedType: 'Arcane' | 'Divine' | null): Step2_1Result => {
+export const generateStep2_1 = (lockedType: string | null, availableMagicTypes: string[]): Step2_1Result => {
   if (lockedType) {
     return {
       roll: null,
@@ -84,8 +94,17 @@ export const generateStep2_1 = (lockedType: 'Arcane' | 'Divine' | null): Step2_1
       message: `Step 2.1 of the generation: Determine Magic Type, locked to ${lockedType}.`
     };
   }
-  const roll = rollDie(6);
-  const type = roll <= 3 ? 'Arcane' : 'Divine';
+  
+  if (!availableMagicTypes || availableMagicTypes.length === 0) {
+    return {
+      roll: null,
+      type: 'Arcane',
+      message: `Step 2.1 Error: No magic types available. Defaulting to Arcane.`
+    };
+  }
+  
+  const roll = rollDie(availableMagicTypes.length);
+  const type = availableMagicTypes[roll - 1];
   return {
     roll,
     type,
@@ -219,18 +238,21 @@ export interface SpellResult {
 export interface Step2_4Result {
   logs: string[];
   spells: SpellResult[];
+  spellListName?: string;
 }
 
 export const generateStep2_4 = (
   spellLists: any[],
   magicType: string,
-  spellLevels: number[],
-  isRitual: boolean
+  spellLevels: number[]
 ): Step2_4Result => {
   const logs: string[] = [];
   const spells: SpellResult[] = [];
 
-  const availableLists = spellLists.filter(list => list.magicType === magicType);
+  let filterMagicType = magicType;
+  
+  let availableLists = spellLists.filter(list => list.magicType === magicType);
+
   let selectedList = availableLists[Math.floor(Math.random() * availableLists.length)];
   
   if (!selectedList) {
@@ -261,7 +283,7 @@ export const generateStep2_4 = (
     spells.push({ level: levelToRoll, name: selectedSpell.name, roll, maxRoll });
   }
 
-  return { logs, spells };
+  return { logs, spells, spellListName: selectedList.name };
 };
 
 export const formatFinalOutput = (

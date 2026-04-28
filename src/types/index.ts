@@ -1,4 +1,4 @@
-export type MagicType = 'Arcane' | 'Divine';
+export type MagicType = string;
 
 export interface Language {
   id: string;
@@ -36,6 +36,7 @@ export interface SavedScroll {
     name: string;
   }[];
   generatedText: string;
+  spellListName?: string;
 }
 
 export interface AppState {

@@ -1,14 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../AppContext';
+import { useConfirm } from '../hooks/useConfirm';
 import { Search, Trash2 } from 'lucide-react';
 import { MagicType } from '../types';
 
 export default function SavedItemsView() {
-  const { savedScrolls, deleteScroll } = useAppContext();
+  const { savedScrolls, deleteScroll, spellLists } = useAppContext();
+  const { confirm } = useConfirm();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMagicType, setFilterMagicType] = useState<MagicType | 'All'>('All');
   const [filterLanguage, setFilterLanguage] = useState<string>('All');
+  const [filterSpellList, setFilterSpellList] = useState<string>('All');
 
   const uniqueLanguages = useMemo(() => {
     const langs = new Set<string>();
@@ -16,14 +19,32 @@ export default function SavedItemsView() {
     return Array.from(langs);
   }, [savedScrolls]);
 
+  const uniqueMagicTypes = useMemo(() => {
+    const types = new Set<string>();
+    savedScrolls.forEach(s => types.add(s.magicType));
+    return Array.from(types);
+  }, [savedScrolls]);
+
+  const uniqueSpellListsOptions = useMemo(() => {
+    return Array.from(new Set(spellLists.map(list => list?.name).filter(Boolean)));
+  }, [spellLists]);
+
   const filteredScrolls = useMemo(() => {
     return savedScrolls.filter(scroll => {
-      const matchesSearch = scroll.generatedText.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = scroll?.generatedText?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesMagicType = filterMagicType === 'All' || scroll.magicType === filterMagicType;
       const matchesLanguage = filterLanguage === 'All' || scroll.language === filterLanguage;
-      return matchesSearch && matchesMagicType && matchesLanguage;
+      
+      const matchesSpellList = filterSpellList === 'All' || (scroll.spells || []).some(scrollSpell => {
+        if (!scrollSpell) return false;
+        const targetList = spellLists.find(l => l?.name === filterSpellList);
+        if (!targetList) return false;
+        return (targetList.levels || []).some(lvl => (lvl.spells || []).some(s => s?.name === scrollSpell?.name));
+      });
+
+      return matchesSearch && matchesMagicType && matchesLanguage && matchesSpellList;
     });
-  }, [savedScrolls, searchTerm, filterMagicType, filterLanguage]);
+  }, [savedScrolls, searchTerm, filterMagicType, filterLanguage, filterSpellList, spellLists]);
 
   return (
     <div className="space-y-6">
@@ -54,8 +75,9 @@ export default function SavedItemsView() {
                 className="bg-app border border-app text-main rounded-xl px-4 py-2 text-sm outline-none focus:border-accent"
               >
                 <option value="All">All Magic Types</option>
-                <option value="Arcane">Arcane</option>
-                <option value="Divine">Divine</option>
+                {uniqueMagicTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
               </select>
               
               <select 
@@ -66,6 +88,17 @@ export default function SavedItemsView() {
                 <option value="All">All Languages</option>
                 {uniqueLanguages.map(lang => (
                   <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+
+              <select 
+                value={filterSpellList}
+                onChange={e => setFilterSpellList(e.target.value)}
+                className="bg-app border border-app text-main rounded-xl px-4 py-2 text-sm outline-none focus:border-accent"
+              >
+                <option value="All">All Spell Lists</option>
+                {uniqueSpellListsOptions.map(list => (
+                  <option key={list} value={list}>{list}</option>
                 ))}
               </select>
             </div>
@@ -92,8 +125,8 @@ export default function SavedItemsView() {
                <div key={scroll.id} className="relative bg-app border border-app rounded-xl p-6 shadow-sm overflow-hidden flex flex-col">
                  <div className="absolute top-4 right-4">
                    <button 
-                     onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this scroll?')) {
+                     onClick={async () => {
+                        if (await confirm({ title: 'Delete Scroll', message: 'Are you sure you want to delete this scroll?' })) {
                           deleteScroll(scroll.id);
                         }
                      }}

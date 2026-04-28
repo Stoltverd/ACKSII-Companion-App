@@ -12,7 +12,7 @@ export const defaultLanguages: Language[] = [
 export const defaultSpellLists: SpellList[] = [
   {
     id: 'arcane_default',
-    name: 'Standard Arcane Spells',
+    name: 'Arcane Spells',
     magicType: 'Arcane',
     levels: [
       {
@@ -141,7 +141,7 @@ export const defaultSpellLists: SpellList[] = [
   },
   {
     id: 'divine_default',
-    name: 'Standard Divine Spells',
+    name: 'Divine Spells',
     magicType: 'Divine',
     levels: [
       {
