@@ -17,12 +17,15 @@ interface PromptOptions {
   confirmText?: string;
   cancelText?: string;
   validate?: (value: string) => string | null;
+  withNote?: boolean;
+  defaultNote?: string;
 }
 
 interface ConfirmContextType {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
   alert: (options: Omit<ConfirmOptions, 'isAlert' | 'cancelText'>) => Promise<boolean>;
   prompt: (options: PromptOptions) => Promise<string | null>;
+  promptWithNote: (options: PromptOptions) => Promise<{ value: string; note: string } | null>;
 }
 
 const ConfirmContext = createContext<ConfirmContextType | null>(null);
@@ -36,6 +39,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   } | null>(null);
   
   const [promptValue, setPromptValue] = useState("");
+  const [promptNoteValue, setPromptNoteValue] = useState("");
   const [promptError, setPromptError] = useState<string | null>(null);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
@@ -59,8 +63,18 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   const prompt = (options: PromptOptions) => {
     return new Promise<string | null>((resolve) => {
       setPromptValue(options.defaultValue || "");
+      setPromptNoteValue(options.defaultNote || "");
       setPromptError(null);
       setModalState({ isOpen: true, type: 'prompt', options, resolve });
+    });
+  };
+
+  const promptWithNote = (options: PromptOptions) => {
+    return new Promise<{ value: string; note: string } | null>((resolve) => {
+      setPromptValue(options.defaultValue || "");
+      setPromptNoteValue(options.defaultNote || "");
+      setPromptError(null);
+      setModalState({ isOpen: true, type: 'prompt', options: { ...options, withNote: true }, resolve });
     });
   };
 
@@ -75,7 +89,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             return;
           }
         }
-        modalState.resolve(promptValue);
+        if (pOpts.withNote) {
+          modalState.resolve({ value: promptValue, note: promptNoteValue });
+        } else {
+          modalState.resolve(promptValue);
+        }
         setModalState(null);
         return;
       }
@@ -96,7 +114,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ConfirmContext.Provider value={{ confirm, alert, prompt }}>
+    <ConfirmContext.Provider value={{ confirm, alert, prompt, promptWithNote }}>
       {children}
       {modalState && modalState.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -108,18 +126,31 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <p className="text-sm text-main">{modalState.options.message}</p>
               
               {modalState.type === 'prompt' && (
-                <div className="mt-4">
-                  <input
-                    type="text"
-                    value={promptValue}
-                    onChange={(e) => {
-                      setPromptValue(e.target.value);
-                      if (promptError) setPromptError(null);
-                    }}
-                    placeholder={(modalState.options as PromptOptions).placeholder || ""}
-                    className="w-full px-3 py-2 bg-app border border-app rounded-lg text-sm text-main outline-none focus:border-accent font-medium mt-2"
-                  />
-                  {promptError && <p className="text-xs text-red-500 mt-1">{promptError}</p>}
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <input
+                      type="text"
+                      value={promptValue}
+                      onChange={(e) => {
+                        setPromptValue(e.target.value);
+                        if (promptError) setPromptError(null);
+                      }}
+                      placeholder={(modalState.options as PromptOptions).placeholder || ""}
+                      className="w-full px-3 py-2 bg-app border border-app rounded-lg text-sm text-main outline-none focus:border-accent font-medium"
+                    />
+                    {promptError && <p className="text-xs text-red-500 mt-1">{promptError}</p>}
+                  </div>
+                  
+                  {(modalState.options as PromptOptions).withNote && (
+                    <div>
+                      <textarea
+                        value={promptNoteValue}
+                        onChange={(e) => setPromptNoteValue(e.target.value)}
+                        placeholder="Add notes about who the owner is, where the scroll was found, or what curse it contains..."
+                        className="w-full px-3 py-2 bg-app border border-app rounded-lg text-sm text-main outline-none focus:border-accent font-medium min-h-[80px] resize-y"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 

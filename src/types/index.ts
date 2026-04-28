@@ -38,6 +38,7 @@ export interface SavedScroll {
   }[];
   generatedText: string;
   spellListName?: string;
+  note?: string;
 }
 
 export interface GlobalSpell {

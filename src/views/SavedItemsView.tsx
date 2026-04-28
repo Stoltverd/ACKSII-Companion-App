@@ -1,17 +1,79 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useAppContext } from '../AppContext';
 import { useConfirm } from '../hooks/useConfirm';
-import { Search, Trash2, Pencil } from 'lucide-react';
-import { MagicType } from '../types';
+import { Search, Trash2, Pencil, FileDown, FileUp } from 'lucide-react';
+import { MagicType, SavedScroll } from '../types';
+import * as yaml from 'js-yaml';
 
 export default function SavedItemsView() {
-  const { savedScrolls, deleteScroll, updateScroll, spellLists } = useAppContext();
-  const { confirm, prompt } = useConfirm();
+  const { savedScrolls, setSavedScrolls, deleteScroll, updateScroll, spellLists } = useAppContext();
+  const { confirm, alert, promptWithNote } = useConfirm();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMagicType, setFilterMagicType] = useState<MagicType | 'All'>('All');
   const [filterLanguage, setFilterLanguage] = useState<string>('All');
   const [filterSpellList, setFilterSpellList] = useState<string>('All');
+
+  const handleExport = () => {
+    try {
+      const yamlStr = yaml.dump({ savedScrolls }, { skipInvalid: true, indent: 2 });
+      const blob = new Blob([yamlStr], { type: 'text/yaml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `acks-ii-saved-scrolls-${new Date().toISOString().split('T')[0]}.yaml`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert({ title: 'Export Failed', message: "There was an error while generating the export file." });
+    }
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const result = yaml.load(event.target?.result as string) as any;
+        if (!result || !Array.isArray(result.savedScrolls)) {
+          alert({ title: 'Invalid File', message: 'The uploaded file does not contain a valid savedScrolls array.' });
+          return;
+        }
+
+        const shouldMerge = await confirm({
+          title: 'Import Scrolls',
+          message: `Found ${result.savedScrolls.length} scrolls in file. Would you like to keep your existing scrolls? (Click Cancel to overwrite completely)`,
+          confirmText: 'Merge (Keep Existing)',
+          cancelText: 'Overwrite All'
+        });
+
+        // Basic validation and ID regeneration
+        const importedScrolls: SavedScroll[] = result.savedScrolls.map((s: any) => ({
+          ...s,
+          id: s.id || crypto.randomUUID()
+        })).filter((s: any) => s.name && s.generatedText);
+
+        if (shouldMerge) {
+          setSavedScrolls(prev => [...importedScrolls, ...prev]);
+        } else {
+          setSavedScrolls(importedScrolls);
+        }
+
+        alert({ title: 'Import Successful', message: `Imported ${importedScrolls.length} scrolls.` });
+      } catch (err: any) {
+        alert({ title: 'Import Error', message: `Failed to import file: ${err.message}` });
+      }
+      
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsText(file);
+  };
 
   const uniqueLanguages = useMemo(() => {
     const langs = new Set<string>();
@@ -51,9 +113,35 @@ export default function SavedItemsView() {
 
   return (
     <div className="space-y-6">
-      <header className="mb-8">
-        <h2 className="font-serif text-3xl mb-2 text-main font-semibold">Saved Items</h2>
-        <p className="text-muted text-sm">Consult and search your previously generated scrolls.</p>
+      <header className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-3xl mb-2 text-main font-semibold">Saved Items</h2>
+          <p className="text-muted text-sm">Consult and search your previously generated scrolls.</p>
+        </div>
+        
+        <div className="flex gap-3">
+          <input
+            type="file"
+            accept=".yaml,.yml"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleImport}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center space-x-2 px-3 py-2 bg-surface border border-app rounded-lg text-sm text-muted hover:text-main transition-colors shadow-sm"
+          >
+            <FileUp size={16} />
+            <span>Import</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="flex items-center space-x-2 px-3 py-2 bg-accent text-white rounded-lg text-sm transition-colors shadow-sm hover:opacity-90"
+          >
+            <FileDown size={16} />
+            <span>Export</span>
+          </button>
+        </div>
       </header>
 
       <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm space-y-6">
@@ -129,11 +217,12 @@ export default function SavedItemsView() {
                  <div className="absolute top-4 right-4 flex space-x-1">
                    <button 
                      onClick={async () => {
-                        const newName = await prompt({
-                          title: 'Rename Scroll',
-                          message: 'Please enter a new name for this scroll:',
+                        const result = await promptWithNote({
+                          title: 'Edit Scroll Name & Notes',
+                          message: 'Please enter a name for this scroll and optional notes:',
                           defaultValue: scroll.name,
-                          confirmText: 'Rename',
+                          defaultNote: scroll.note || '',
+                          confirmText: 'Save',
                           validate: (value) => {
                             const trimmed = value.trim();
                             if (trimmed.length === 0) return "Name cannot be empty.";
@@ -142,12 +231,15 @@ export default function SavedItemsView() {
                             return null;
                           }
                         });
-                        if (newName) {
-                          updateScroll(scroll.id, newName.trim());
+                        if (result) {
+                          updateScroll(scroll.id, { 
+                            name: result.value.trim(),
+                            note: result.note.trim()
+                          });
                         }
                      }}
                      className="p-1.5 text-muted hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
-                     title="Rename Scroll"
+                     title="Edit Scroll"
                    >
                      <Pencil size={16} />
                    </button>
@@ -164,7 +256,7 @@ export default function SavedItemsView() {
                    </button>
                  </div>
                  
-                 <div className="mb-4 pr-16 space-y-2">
+                 <div className="mb-4 pr-16 space-y-3">
                    {scroll.name && (
                      <h3 className="font-serif text-xl font-bold text-main">{scroll.name}</h3>
                    )}
@@ -176,6 +268,13 @@ export default function SavedItemsView() {
                        {scroll.magicType}
                      </span>
                    </div>
+                   
+                   {scroll.note && (
+                     <div className="bg-surface/50 p-3 rounded-lg border border-app shadow-sm mt-2">
+                       <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-1">Notes</h4>
+                       <p className="text-sm text-main whitespace-pre-wrap">{scroll.note}</p>
+                     </div>
+                   )}
                  </div>
                  
                  <div className="flex-1 bg-yellow-50 dark:bg-[#2a2820] text-amber-900 dark:text-amber-100 p-4 rounded-xl font-serif text-sm border border-yellow-200 dark:border-yellow-900/50 whitespace-pre-wrap leading-relaxed shadow-inner overflow-y-auto max-h-[300px]">

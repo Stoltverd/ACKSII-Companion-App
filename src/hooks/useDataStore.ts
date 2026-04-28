@@ -103,8 +103,8 @@ export function useDataStore() {
     setSavedScrolls(prev => [scroll, ...prev]);
   };
 
-  const updateScroll = (id: string, newName: string) => {
-    setSavedScrolls(prev => prev.map(s => s.id === id ? { ...s, name: newName } : s));
+  const updateScroll = (id: string, updates: Partial<SavedScroll>) => {
+    setSavedScrolls(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
 
   const deleteScroll = (id: string) => {
@@ -144,6 +144,7 @@ export function useDataStore() {
     spells,
     setSpells,
     savedScrolls,
+    setSavedScrolls,
     saveScroll,
     updateScroll,
     deleteScroll,

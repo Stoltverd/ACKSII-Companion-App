@@ -8,7 +8,7 @@ import { MagicType } from '../types';
 export default function GeneratorView() {
   const { languages, spellLists, saveScroll } = useAppContext();
   const { state, lockedMagicType, setLockedMagicType, lockedLanguage, setLockedLanguage, lockedLevels, setLockedLevels, startGeneration } = useGenerator(languages, spellLists);
-  const { alert: showAlert, prompt } = useConfirm();
+  const { alert: showAlert, promptWithNote } = useConfirm();
   
   useEffect(() => {
     // If not locked or ID is invalid, pick default to avoid empty selects
@@ -19,7 +19,7 @@ export default function GeneratorView() {
 
   const handleSave = async () => {
     if (state.resultData && state.finalOutput) {
-      const name = await prompt({
+      const result = await promptWithNote({
         title: 'Save Scroll',
         message: 'Please enter a name for this scroll:',
         placeholder: 'e.g. Scroll of Fireball',
@@ -33,20 +33,21 @@ export default function GeneratorView() {
         }
       });
 
-      if (!name) return; // User cancelled
+      if (!result) return; // User cancelled
 
       saveScroll({
         id: crypto.randomUUID(),
-        name: name.trim(),
+        name: result.value.trim(),
         dateSaved: Date.now(),
         magicType: state.resultData.magicType,
         language: state.resultData.language,
         totalLevels: state.resultData.totalLevels,
         spells: state.resultData.spells,
         generatedText: state.finalOutput,
-        spellListName: state.resultData.spellListName
+        spellListName: state.resultData.spellListName,
+        note: result.note.trim()
       });
-      showAlert({ title: 'Success', message: 'Scroll saved successfully! You can view it in the Saved tab.' });
+      showAlert({ title: 'Success', message: 'Scroll saved successfully! You can view it in the Saved Items section.' });
     }
   };
 

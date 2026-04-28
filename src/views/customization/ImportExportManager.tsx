@@ -6,7 +6,7 @@ import { Language, SpellList } from '../../types';
 import * as yaml from 'js-yaml';
 
 export default function ImportExportManager() {
-  const { languages, setLanguages, spellLists, setSpellLists, restoreDefaults } = useAppContext();
+  const { languages, setLanguages, spellLists, setSpellLists, spells, setSpells, restoreDefaults } = useAppContext();
   const { confirm, alert: showAlert } = useConfirm();
   
   const [importStrategy, setImportStrategy] = useState<'merge' | 'skip' | 'overwrite'>('merge');
@@ -22,9 +22,19 @@ export default function ImportExportManager() {
           isDivineOnly: l.isDivineOnly,
           percentage: l.rangeMax - l.rangeMin + 1
       }));
-      dataToExport = { languages: exportLangs, spellLists };
+      dataToExport = { languages: exportLangs, spellLists, spells };
     } else {
-      dataToExport = { spellLists: spellLists.filter(sl => exportSelection.includes(sl.id)) };
+      const selectedLists = spellLists.filter(sl => exportSelection.includes(sl.id));
+      const extractedSpellNames = new Set<string>();
+      selectedLists.forEach(list => {
+        list.levels.forEach(lvl => {
+          lvl.spells.forEach(s => {
+            extractedSpellNames.add(s.name);
+          });
+        });
+      });
+      const selectedSpells = spells.filter(s => extractedSpellNames.has(s.name));
+      dataToExport = { spellLists: selectedLists, spells: selectedSpells };
     }
     try {
       const yamlStr = yaml.dump(dataToExport, { skipInvalid: true, indent: 2 });
@@ -149,6 +159,9 @@ export default function ImportExportManager() {
 
           log += `- Processed spells dataset: ${addedSpellCount} added, ${mergedSpellCount} merged, ${overwrittenSpellCount} overwritten, ${skippedSpellCount} skipped.\n`;
         } else {
+          let finalLists = [...spellLists];
+          let finalSpells = [...spells];
+          
           if (importStrategy === 'overwrite') {
             if (result.languages && Array.isArray(result.languages)) {
               let currentMin = 1;
@@ -168,10 +181,31 @@ export default function ImportExportManager() {
               log += `- Overwrote ${parsedLangs.length} languages.\n`;
             }
             if (result.spellLists) {
-              setSpellLists(result.spellLists);
+              finalLists = result.spellLists;
+              setSpellLists(finalLists);
               log += `- Overwrote ${result.spellLists.length} spell lists.\n`;
             }
+            if (result.spells && Array.isArray(result.spells)) {
+              finalSpells = result.spells;
+              log += `- Overwrote global spell library with ${result.spells.length} spells.\n`;
+            } else if (result.spellLists) {
+               const extracted = new Map<string, GlobalSpell>();
+               result.spellLists.forEach((list: any) => {
+                 list.levels.forEach((lvl: any) => {
+                   lvl.spells.forEach((s: any) => {
+                     if (!extracted.has(s.name.toLowerCase())) {
+                       extracted.set(s.name.toLowerCase(), { id: s.id || crypto.randomUUID(), name: s.name });
+                     }
+                   });
+                 });
+               });
+               finalSpells = Array.from(extracted.values());
+               log += `- Extracted ${extracted.size} global spells from imported spell lists (Legacy Support).\n`;
+            } else {
+              finalSpells = []; // Complete wipe if overwrite but no spells/spellLists provided
+            }
           } else {
+            // merge or skip
             if (result.languages && Array.isArray(result.languages)) {
               let addCount = 0; let updateCount = 0; let skipCount = 0;
               let newLangs = languages.map(l => ({...l, percentage: l.rangeMax - l.rangeMin + 1}));
@@ -217,30 +251,76 @@ export default function ImportExportManager() {
 
             if (result.spellLists && Array.isArray(result.spellLists)) {
               let addCount = 0; let updateCount = 0; let skipCount = 0;
-              setSpellLists(prev => {
-                let newLists = [...prev];
-                result.spellLists.forEach((il: SpellList) => {
-                  const idx = newLists.findIndex(l => l.name === il.name);
-                  if (idx >= 0) {
-                    if (importStrategy === 'merge') {
-                      newLists[idx] = { ...il, id: newLists[idx].id };
-                      updateCount++;
-                    } else if (importStrategy === 'skip') {
-                      skipCount++;
-                    }
-                  } else {
-                    newLists.push({ ...il, id: crypto.randomUUID() });
-                    addCount++;
+              let newLists = [...spellLists];
+              result.spellLists.forEach((il: SpellList) => {
+                const idx = newLists.findIndex(l => l.name === il.name);
+                if (idx >= 0) {
+                  if (importStrategy === 'merge') {
+                    newLists[idx] = { ...il, id: newLists[idx].id };
+                    updateCount++;
+                  } else if (importStrategy === 'skip') {
+                    skipCount++;
                   }
-                });
-                return newLists;
+                } else {
+                  newLists.push({ ...il, id: crypto.randomUUID() });
+                  addCount++;
+                }
               });
+              finalLists = newLists;
+              setSpellLists(finalLists);
               log += `- Spell lists: ${addCount} added, ${updateCount} updated, ${skipCount} skipped.\n`;
             }
+            
+            if (result.spells && Array.isArray(result.spells)) {
+               let addSCount = 0; let updateSCount = 0; let skipSCount = 0;
+               let newSpells = [...spells];
+               result.spells.forEach((is: GlobalSpell) => {
+                 const idx = newSpells.findIndex(s => s.name.toLowerCase() === is.name.toLowerCase());
+                 if (idx >= 0) {
+                   if (importStrategy === 'merge') {
+                     newSpells[idx] = { ...is, id: newSpells[idx].id };
+                     updateSCount++;
+                   } else {
+                     skipSCount++;
+                   }
+                 } else {
+                   newSpells.push({ ...is, id: is.id || crypto.randomUUID() });
+                   addSCount++;
+                 }
+               });
+               finalSpells = newSpells;
+               log += `- Global Spells: ${addSCount} added, ${updateSCount} updated, ${skipSCount} skipped.\n`;
+            }
           }
+          
+          // Dependency validation: make sure any spell referenced in finalLists exists in finalSpells
+          let missingSpellsCreated = 0;
+          const globalSpellNames = new Set(finalSpells.map(s => s.name.toLowerCase()));
+          
+          finalLists.forEach(list => {
+            list.levels.forEach(lvl => {
+              lvl.spells.forEach(spell => {
+                if (!globalSpellNames.has(spell.name.toLowerCase())) {
+                  finalSpells.push({
+                    id: spell.id || crypto.randomUUID(),
+                    name: spell.name
+                  });
+                  globalSpellNames.add(spell.name.toLowerCase());
+                  missingSpellsCreated++;
+                }
+              });
+            });
+          });
+          
+          if (missingSpellsCreated > 0) {
+            log += `- Created ${missingSpellsCreated} missing global spells to satisfy list references.\n`;
+          }
+          
+          setSpells(finalSpells);
+          log += '\nImport successful.';
         }
         
-        setImportLog(log + '\nImport successful.');
+        setImportLog(log);
       } catch (err: any) {
         setImportLog(`Error during import:\n${err.message}`);
       }
