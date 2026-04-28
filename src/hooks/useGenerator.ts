@@ -53,14 +53,37 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
 
       // Step 1
       const step1 = generateStep1(lockedLevels.isLocked ? lockedLevels.value : null);
-      newLog.push(step1.message);
+      
+      let finalOutput = step1.message;
+      if (step1.isFinished && step1.message.includes('\n')) {
+        const parts = step1.message.split('\n');
+        newLog.push(parts[0]);
+        finalOutput = parts.slice(1).join('\n');
+      } else {
+        newLog.push(step1.message);
+      }
       
       if (step1.isFinished) {
+        let language = '';
+
+        if (step1.type === 'Creature Warding Scroll' || step1.type === 'Cursed Scroll' || step1.type === 'Magic Warding Scroll') {
+          const step2_2 = generateStep2_2(languages, 'None', lockedLanguage.isLocked ? lockedLanguage.id : null);
+          newLog = newLog.concat(step2_2.logs);
+          language = step2_2.languageName;
+          finalOutput = `This sheet of papyrus is written in ${language}.\n${finalOutput}`;
+        }
+
         setState({
           isGenerating: false,
           log: newLog,
           isFinished: true,
-          finalOutput: step1.message,
+          finalOutput,
+          resultData: language ? {
+            magicType: 'None',
+            language,
+            totalLevels: 0,
+            spells: []
+          } : undefined
         });
         return;
       }
@@ -82,7 +105,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels);
       newLog = newLog.concat(step2_4.logs);
 
-      const finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
+      finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
       
       setState({
         isGenerating: false,

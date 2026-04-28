@@ -27,6 +27,7 @@ export interface SpellList {
 
 export interface SavedScroll {
   id: string;
+  name: string;
   dateSaved: number;
   magicType: MagicType;
   language: string;

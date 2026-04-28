@@ -45,6 +45,10 @@ export function useDataStore() {
     setSavedScrolls(prev => [scroll, ...prev]);
   };
 
+  const updateScroll = (id: string, newName: string) => {
+    setSavedScrolls(prev => prev.map(s => s.id === id ? { ...s, name: newName } : s));
+  };
+
   const deleteScroll = (id: string) => {
     setSavedScrolls(prev => prev.filter(s => s.id !== id));
   };
@@ -63,6 +67,7 @@ export function useDataStore() {
     setSpellLists,
     savedScrolls,
     saveScroll,
+    updateScroll,
     deleteScroll,
     restoreDefaults
   };

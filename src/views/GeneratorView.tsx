@@ -8,7 +8,7 @@ import { MagicType } from '../types';
 export default function GeneratorView() {
   const { languages, spellLists, saveScroll } = useAppContext();
   const { state, lockedMagicType, setLockedMagicType, lockedLanguage, setLockedLanguage, lockedLevels, setLockedLevels, startGeneration } = useGenerator(languages, spellLists);
-  const { alert: showAlert } = useConfirm();
+  const { alert: showAlert, prompt } = useConfirm();
   
   useEffect(() => {
     // If not locked or ID is invalid, pick default to avoid empty selects
@@ -17,10 +17,27 @@ export default function GeneratorView() {
     }
   }, [languages]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (state.resultData && state.finalOutput) {
+      const name = await prompt({
+        title: 'Save Scroll',
+        message: 'Please enter a name for this scroll:',
+        placeholder: 'e.g. Scroll of Fireball',
+        confirmText: 'Save',
+        validate: (value) => {
+          const trimmed = value.trim();
+          if (trimmed.length === 0) return "Name cannot be empty.";
+          const validNameRegex = /^[a-zA-Z0-9\s\-_áéíóúÁÉÍÓÚöÖñÑ]+$/;
+          if (!validNameRegex.test(trimmed)) return "Name contains invalid characters.";
+          return null;
+        }
+      });
+
+      if (!name) return; // User cancelled
+
       saveScroll({
         id: crypto.randomUUID(),
+        name: name.trim(),
         dateSaved: Date.now(),
         magicType: state.resultData.magicType,
         language: state.resultData.language,

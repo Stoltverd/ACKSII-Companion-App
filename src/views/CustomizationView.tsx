@@ -302,10 +302,17 @@ export default function CustomizationView() {
                             style={{ width }} 
                             onClick={(e) => {
                                // Optional: e.preventDefault()
-                               const el = document.getElementById(`lang-input-${lang.id}`);
-                               if (el) {
-                                 el.focus();
-                                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                               const inputEl = document.getElementById(`lang-input-${lang.id}`);
+                               const cardEl = document.getElementById(`lang-card-${lang.id}`);
+                               if (inputEl && cardEl) {
+                                 cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                 setTimeout(() => inputEl.focus(), 50);
+                                 
+                                 // Add visual pulse/breath effect
+                                 cardEl.classList.add('ring-2', 'ring-accent', 'scale-[1.02]', 'shadow-lg');
+                                 setTimeout(() => {
+                                   cardEl.classList.remove('ring-2', 'ring-accent', 'scale-[1.02]', 'shadow-lg');
+                                 }, 400);
                                }
                             }}
                             className={`h-full ${colorClass} transition-all duration-300 ease-in-out border-r border-[#ffffff20] last:border-r-0 cursor-pointer hover:opacity-80`}
@@ -355,7 +362,7 @@ export default function CustomizationView() {
                     const colors = ['bg-blue-500', 'bg-purple-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500', 'bg-cyan-500', 'bg-indigo-500', 'bg-orange-500'];
                     const colorClass = colors[index % colors.length];
                     return (
-                    <div key={lang.id} className="flex items-center gap-4 bg-app p-4 rounded-xl border border-app transition-all">
+                    <div id={`lang-card-${lang.id}`} key={lang.id} className="flex items-center gap-4 bg-app p-4 rounded-xl border border-app transition-all duration-300 transform">
                       <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
                         <div className="md:col-span-6">
                           <label className="flex items-center space-x-1.5 text-xs font-medium text-muted mb-1">
