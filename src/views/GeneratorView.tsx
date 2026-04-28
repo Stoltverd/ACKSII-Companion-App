@@ -151,14 +151,32 @@ export default function GeneratorView() {
                   </button>
                 </div>
                 {lockedLevels.isLocked && (
-                  <input
-                    type="number"
-                    min="1"
-                    max="24"
-                    value={lockedLevels.value}
-                    onChange={(e) => setLockedLevels(prev => ({ ...prev, value: parseInt(e.target.value) || 1 }))}
-                    className="w-full bg-app border border-app text-main rounded-lg px-3 py-2 text-sm outline-none focus:border-accent font-medium"
-                  />
+                  <div className="space-y-1">
+                    <input
+                      type="number"
+                      min="1"
+                      max="24"
+                      value={lockedLevels.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          setLockedLevels(prev => ({ ...prev, value: '' }));
+                        } else {
+                          const parsed = parseInt(val, 10);
+                          if (!isNaN(parsed)) {
+                            setLockedLevels(prev => ({ ...prev, value: Math.min(24, Math.max(1, parsed)) }));
+                          }
+                        }
+                      }}
+                      onBlur={() => {
+                        if (lockedLevels.value === '' || lockedLevels.value < 1) {
+                          setLockedLevels(prev => ({ ...prev, value: 1 }));
+                        }
+                      }}
+                      className="w-full bg-app border border-app text-main rounded-lg px-3 py-2 text-sm outline-none focus:border-accent font-medium"
+                    />
+                    <p className="text-xs text-muted">Max 24 levels</p>
+                  </div>
                 )}
                 {!lockedLevels.isLocked && (
                   <p className="text-xs text-muted">A d100 roll will determine total spell levels.</p>

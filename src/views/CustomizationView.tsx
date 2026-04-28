@@ -5,12 +5,13 @@ import { Settings2, BookA, Trash2, Plus, GripVertical, FileDown, FileUp, X } fro
 import { Language, SpellList } from '../types';
 import * as yaml from 'js-yaml';
 import SpellEditorModal from './SpellEditorModal';
+import GlobalSpellLibrary from './GlobalSpellLibrary';
 
 export default function CustomizationView() {
-  const { languages, setLanguages, spellLists, setSpellLists, restoreDefaults } = useAppContext();
+  const { languages, setLanguages, spellLists, setSpellLists, spells, setSpells, restoreDefaults } = useAppContext();
   const { confirm, alert: showAlert } = useConfirm();
   
-  const [activeTab, setActiveTab] = useState<'languages' | 'spellLists' | 'importExport'>('languages');
+  const [activeTab, setActiveTab] = useState<'languages' | 'spellLists' | 'spells' | 'importExport'>('languages');
   const [importStrategy, setImportStrategy] = useState<'merge' | 'skip' | 'overwrite'>('merge');
   const [importLog, setImportLog] = useState<string>('');
   const [exportSelection, setExportSelection] = useState<string[]>([]); // URLs/IDs of spell lists
@@ -98,6 +99,24 @@ export default function CustomizationView() {
        return newDrafts;
     });
     showAlert({ id: 'addLanguageWarning', title: 'Language Added', message: "Language added, but has a 0% encounter chance. Allocate space for it." });
+  };
+
+  const [editingMagicTypeListId, setEditingMagicTypeListId] = useState<string | null>(null);
+
+  const availableMagicTypes = React.useMemo(() => {
+    const types = new Set(spellLists.map(l => l.magicType).filter(Boolean));
+    types.add('Arcane');
+    types.add('Divine');
+    return Array.from(types).sort();
+  }, [spellLists]);
+
+  const handleMagicTypeSelect = (listId: string, value: string) => {
+    if (value === '__new__') {
+      setEditingMagicTypeListId(listId);
+      handleSpellListChange(listId, 'magicType', '');
+    } else {
+      handleSpellListChange(listId, 'magicType', value);
+    }
   };
 
   const autoBalanceLanguages = () => {
@@ -217,7 +236,16 @@ export default function CustomizationView() {
             }`}
           >
             <Settings2 size={16} />
-            <span>Spell Lists</span>
+            <span>Lists</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('spells')}
+            className={`flex-1 py-3 text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+              activeTab === 'spells' ? 'bg-surface text-main border-t-2 border-t-accent' : 'text-muted hover:text-main'
+            }`}
+          >
+            <BookA size={16} />
+            <span>Spells</span>
           </button>
           <button
             onClick={() => setActiveTab('importExport')}
@@ -455,14 +483,44 @@ export default function CustomizationView() {
                         </div>
                         <div className="md:col-span-4">
                           <label className="block text-xs font-medium text-muted mb-1">Magic Type</label>
-                          <select 
-                            value={list.magicType}
-                            onChange={e => handleSpellListChange(list.id, 'magicType', e.target.value)}
-                            className="w-full bg-surface border border-app rounded-lg px-3 py-1.5 text-sm outline-none focus:border-accent"
-                          >
-                            <option value="Arcane">Arcane</option>
-                            <option value="Divine">Divine</option>
-                          </select>
+                          {editingMagicTypeListId !== list.id ? (
+                            <select 
+                              value={availableMagicTypes.includes(list.magicType) ? list.magicType : ''}
+                              onChange={e => handleMagicTypeSelect(list.id, e.target.value)}
+                              className="w-full bg-surface border border-app rounded-lg px-3 py-1.5 text-sm outline-none focus:border-accent"
+                            >
+                              {availableMagicTypes.map(m => (
+                                <option key={m} value={m}>{m}</option>
+                              ))}
+                              {!availableMagicTypes.includes(list.magicType) && list.magicType && (
+                                <option value={list.magicType}>{list.magicType}</option>
+                              )}
+                              <option value="__new__">+ Create New Magic Type</option>
+                            </select>
+                          ) : (
+                            <input 
+                              autoFocus
+                              type="text"
+                              value={list.magicType}
+                              onChange={e => handleSpellListChange(list.id, 'magicType', e.target.value)}
+                              onBlur={() => {
+                                if (!list.magicType.trim()) {
+                                  handleSpellListChange(list.id, 'magicType', 'Arcane');
+                                }
+                                setEditingMagicTypeListId(null);
+                              }}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  if (!list.magicType.trim()) {
+                                    handleSpellListChange(list.id, 'magicType', 'Arcane');
+                                  }
+                                  setEditingMagicTypeListId(null);
+                                }
+                              }}
+                              placeholder="e.g. Psionic"
+                              className="w-full bg-surface border border-accent ring-1 ring-accent rounded-lg px-3 py-1.5 text-sm outline-none font-medium"
+                            />
+                          )}
                         </div>
                       </div>
                       <button 
@@ -495,6 +553,9 @@ export default function CustomizationView() {
                 </div>
               )}
             </div>
+          )}
+          {activeTab === 'spells' && (
+            <GlobalSpellLibrary />
           )}
           {activeTab === 'importExport' && (
             <div className="space-y-8">

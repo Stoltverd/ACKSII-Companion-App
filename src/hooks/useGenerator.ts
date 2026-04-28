@@ -36,7 +36,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
     id: null
   });
 
-  const [lockedLevels, setLockedLevels] = useState<{ isLocked: boolean, value: number }>({
+  const [lockedLevels, setLockedLevels] = useState<{ isLocked: boolean, value: number | '' }>({
     isLocked: false,
     value: 1
   });
@@ -52,7 +52,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
       let newLog: string[] = [];
 
       // Step 1
-      const step1 = generateStep1(lockedLevels.isLocked ? lockedLevels.value : null);
+      const step1 = generateStep1(lockedLevels.isLocked ? (lockedLevels.value === '' ? 1 : lockedLevels.value) : null);
       
       let finalOutput = step1.message;
       if (step1.isFinished && step1.message.includes('\n')) {

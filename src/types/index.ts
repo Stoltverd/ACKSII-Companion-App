@@ -40,8 +40,14 @@ export interface SavedScroll {
   spellListName?: string;
 }
 
+export interface GlobalSpell {
+  id: string;
+  name: string;
+}
+
 export interface AppState {
   languages: Language[];
   spellLists: SpellList[];
+  spells: GlobalSpell[];
   savedScrolls: SavedScroll[];
 }
