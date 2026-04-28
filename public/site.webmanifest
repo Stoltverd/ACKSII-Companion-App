@@ -1,0 +1,19 @@
+{
+    "name": "ACKSII Companion App",
+    "short_name": "ACKSII",
+    "icons": [
+        {
+            "src": "/favicon-180x180.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "display": "standalone"
+}
