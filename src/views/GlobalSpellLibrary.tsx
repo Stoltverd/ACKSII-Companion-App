@@ -14,9 +14,9 @@ export default function GlobalSpellLibrary() {
   // local edits for form
   const [editName, setEditName] = useState('');
   
-  // Spell mapping: which lists contain this spell?
+  // Spell mapping: which lists contain this spell and at what level?
   const spellsListsMap = useMemo(() => {
-    const map = new Map<string, string[]>();
+    const map = new Map<string, { listName: string, level: number }[]>();
     spells.forEach(s => map.set(s.name.toLowerCase(), []));
     
     spellLists.forEach(list => {
@@ -26,8 +26,9 @@ export default function GlobalSpellLibrary() {
           if (!map.has(key)) {
             map.set(key, []);
           }
-          if (!map.get(key)!.includes(list.name)) {
-            map.get(key)!.push(list.name);
+          const existing = map.get(key)!;
+          if (!existing.some(e => e.listName === list.name)) {
+            existing.push({ listName: list.name, level: lvl.level });
           }
         });
       });
@@ -175,9 +176,16 @@ export default function GlobalSpellLibrary() {
                           0 lists (Orphaned)
                         </span>
                       ) : (
-                        <span className="text-muted text-xs truncate max-w-[200px] block" title={assignedLists.join(', ')}>
-                          {assignedLists.length} {assignedLists.length === 1 ? 'list' : 'lists'}
-                        </span>
+                        <div className="flex flex-wrap gap-1.5" title={assignedLists.map(a => `${a.listName} (Lvl ${a.level})`).join(', ')}>
+                          {assignedLists.map((assigned, idx) => (
+                            <span 
+                              key={idx} 
+                              className="inline-flex items-center px-2.5 py-1 rounded bg-surface border border-app text-xs text-muted truncate max-w-[180px]"
+                            >
+                              {assigned.listName} <span className="opacity-70 ml-1">(Lvl {assigned.level})</span>
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -237,7 +245,7 @@ export default function GlobalSpellLibrary() {
                   placeholder="e.g. Fireball"
                   autoFocus
                 />
-                <p className="text-[10px] text-muted mt-2 leading-tight">
+                <p className="text-xs text-muted mt-2 leading-tight">
                   Once created, you can assign levels to this spell within specific lists.
                 </p>
               </div>

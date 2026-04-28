@@ -10,6 +10,7 @@ export function useDataStore() {
   const [spellLists, setSpellLists] = useState<SpellList[]>([]);
   const [spells, setSpells] = useState<GlobalSpell[]>([]);
   const [savedScrolls, setSavedScrolls] = useState<SavedScroll[]>([]);
+  const [appMode, setAppMode] = useState<'judge' | 'player'>('judge');
 
   // Load initially
   useEffect(() => {
@@ -17,6 +18,7 @@ export function useDataStore() {
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as any;
+        setAppMode(parsed.appMode === 'player' ? 'player' : 'judge');
         setLanguages(parsed.languages || JSON.parse(JSON.stringify(defaultLanguages)));
         
         const initialLists = parsed.spellLists || JSON.parse(JSON.stringify(defaultSpellLists));
@@ -92,10 +94,10 @@ export function useDataStore() {
   // Save on change
   useEffect(() => {
     if (isLoaded) {
-      const stateToSave: AppState = { languages, spellLists, spells, savedScrolls };
+      const stateToSave: AppState = { languages, spellLists, spells, savedScrolls, appMode };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
-  }, [languages, spellLists, spells, savedScrolls, isLoaded]);
+  }, [languages, spellLists, spells, savedScrolls, appMode, isLoaded]);
 
   const saveScroll = (scroll: SavedScroll) => {
     setSavedScrolls(prev => [scroll, ...prev]);
@@ -133,6 +135,8 @@ export function useDataStore() {
 
   return {
     isLoaded,
+    appMode,
+    setAppMode,
     languages,
     setLanguages,
     spellLists,

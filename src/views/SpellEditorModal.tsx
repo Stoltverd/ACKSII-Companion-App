@@ -193,7 +193,7 @@ export default function SpellEditorModal({ listId, spellLists, setSpellLists, on
                 <div className="flex-1">
                   <label className="block text-xs font-semibold text-muted mb-1 uppercase tracking-wider flex items-center justify-between">
                     <span>Level</span>
-                    <span className="text-[10px] text-muted/70 font-normal normal-case tracking-normal">Specific to this list</span>
+                    <span className="text-xs text-muted/70 font-normal normal-case tracking-normal">Specific to this list</span>
                   </label>
                   <input 
                     type="number"
@@ -217,8 +217,8 @@ export default function SpellEditorModal({ listId, spellLists, setSpellLists, on
                     }}
                     className="w-full bg-surface border border-app rounded-md px-3 py-2 text-sm text-main"
                   />
-                  <p className="text-[10px] text-muted mt-1 leading-tight">
-                    Levels are defined per list. This spelling will be added at this level to the selected lists.
+                  <p className="text-xs text-muted mt-1 leading-tight">
+                    Levels are defined per list. This spell will be added at this level to the selected lists.
                   </p>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export default function SpellEditorModal({ listId, spellLists, setSpellLists, on
                 </button>
               </div>
             </div>
-            <p className="text-[10px] text-muted mt-2 leading-tight">
+            <p className="text-xs text-muted mt-2 leading-tight">
               Levels are defined per list. The level you enter above only applies to this list.
             </p>
           </div>

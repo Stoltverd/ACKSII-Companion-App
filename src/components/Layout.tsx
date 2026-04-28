@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, Scroll, Map, Settings2, Bookmark, Settings, Sun, Moon } from 'lucide-react';
+import { Menu, X, Scroll, Map, Settings2, Bookmark, Settings, Sun, Moon, Shield, User, Database } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+import { useAppContext } from '../AppContext';
 
-const NAV_ITEMS = [
+const JUDGE_NAV_ITEMS = [
   { section: 'Generators' },
   { name: 'Scroll Generator', path: '/', icon: Scroll },
   { name: 'Treasure Map Generator', path: '/treasure-map', icon: Map },
-  { section: 'Data' },
-  { name: 'Customization', path: '/customization', icon: Settings2 },
+  { section: 'Judge Data' },
+  { name: 'Data Management', path: '/customization', icon: Database },
   { name: 'Saved Items', path: '/saved', icon: Bookmark },
-  { section: 'Other' },
+  { section: 'System' },
+  { name: 'Settings', path: '/settings', icon: Settings },
+];
+
+const PLAYER_NAV_ITEMS = [
+  { section: 'Player Tools' },
+  { name: 'Character Manager (Soon)', path: '/player/characters', icon: User },
+  { section: 'Player Data' },
+  { name: 'Inventory (Soon)', path: '/player/inventory', icon: Bookmark },
+  { section: 'System' },
   { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
@@ -18,6 +28,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { appMode, setAppMode } = useAppContext();
+
+  const NAV_ITEMS = appMode === 'judge' ? JUDGE_NAV_ITEMS : PLAYER_NAV_ITEMS;
 
   // Close menu when route changes
   useEffect(() => {
@@ -53,7 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <h1 className="font-serif text-xl font-bold tracking-tight text-accent leading-none">
               ACKS II
             </h1>
-            <span className="text-xs text-muted tracking-widest uppercase font-semibold">Companion</span>
+            <span className="text-xs text-muted tracking-widest uppercase font-semibold">Companion <span className="opacity-70">| {appMode === 'judge' ? 'Judge' : 'Player'}</span></span>
           </div>
         </div>
 
@@ -129,7 +142,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </ul>
         </nav>
         
-        {/* Footer actions in drawer maybe? */}
+        {/* Footer actions in drawer showing appMode toggle */}
+        <div className="p-4 border-t border-app">
+          <button 
+            onClick={() => setAppMode(appMode === 'judge' ? 'player' : 'judge')}
+            className="w-full flex items-center justify-center py-2 px-4 rounded-md border border-app hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+          >
+            {appMode === 'judge' ? (
+              <><Shield size={16} className="mr-2 text-accent" /> Switch to Player Mode</>
+            ) : (
+              <><User size={16} className="mr-2 text-accent" /> Switch to Judge Mode</>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}

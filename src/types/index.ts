@@ -46,6 +46,7 @@ export interface GlobalSpell {
 }
 
 export interface AppState {
+  appMode?: 'judge' | 'player';
   languages: Language[];
   spellLists: SpellList[];
   spells: GlobalSpell[];
