@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Ignore icons to prevent corruption during GitHub export
+public/android-chrome-*.png
+public/apple-touch-icon.png
+public/favicon-*.png
+public/favicon.ico
+public/site.webmanifest
