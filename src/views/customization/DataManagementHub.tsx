@@ -20,7 +20,8 @@ export default function DataManagementHub() {
       title: "World Lore",
       icon: <Database className="text-amber-500" size={24} />,
       links: [
-        { name: "Language Tables", path: "languages", description: `Adjust probabilities for ${languages.length} languages.`, icon: <BookA size={16} /> }
+        { name: "Language Tables", path: "languages", description: `Adjust probabilities for ${languages.length} languages.`, icon: <BookA size={16} /> },
+        { name: "World Type", path: "world-type", description: "Set default campaign setting flavor.", icon: <Settings2 size={16} /> }
       ]
     },
     {

@@ -12,7 +12,8 @@ import { HoardTableType } from '../types';
 export default function TreasureMapView() {
   const { saveTreasureMap, settings } = useAppContext();
   const { promptWithNote, alert: showAlert } = useConfirm();
-  const { state, setGlobalLock, setHoardTable, setClueLock, generate, reset } = useTreasureMapGenerator();
+  const defaultWorldType = settings?.defaultWorldType || 'Classic';
+  const { state, setGlobalLock, setHoardTable, setClueLock, generate, reset } = useTreasureMapGenerator(defaultWorldType);
 
   useEffect(() => {
     if (state.isFinished && settings?.autoScrollToTop?.['treasureMap']) {

@@ -74,6 +74,7 @@ export interface AppSettings {
   autoScrollToTop: {
     [generatorId: string]: boolean;
   };
+  defaultWorldType?: 'Classic' | 'Heroic' | 'Gritty';
 }
 
 export interface AppState {

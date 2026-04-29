@@ -15,6 +15,7 @@ import LanguagesManager from './views/customization/LanguagesManager';
 import SpellListsManager from './views/customization/SpellListsManager';
 import GlobalSpellLibrary from './views/GlobalSpellLibrary'; // Using the existing one
 import ImportExportManager from './views/customization/ImportExportManager';
+import WorldSettingsManager from './views/customization/WorldSettingsManager';
 
 // ... Placeholder views stay the same
 const PlayerPlaceholder = ({ title }: { title: string }) => (
@@ -56,6 +57,7 @@ export default function App() {
               <Route path="/customization" element={<CustomizationLayout />}>
                 <Route index element={<DataManagementHub />} />
                 <Route path="languages" element={<LanguagesManager />} />
+                <Route path="world-type" element={<WorldSettingsManager />} />
                 <Route path="lists" element={<SpellListsManager />} />
                 <Route path="spells" element={<GlobalSpellLibrary />} />
                 <Route path="import-export" element={<ImportExportManager />} />

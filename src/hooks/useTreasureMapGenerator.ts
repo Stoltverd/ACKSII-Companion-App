@@ -117,8 +117,21 @@ function reducer(state: TreasureMapState, action: Action): TreasureMapState {
   }
 }
 
-export function useTreasureMapGenerator() {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function useTreasureMapGenerator(defaultWorldType: HoardTableType = 'Classic') {
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    config: {
+      ...initialState.config,
+      hoardTableType: defaultWorldType
+    }
+  });
+
+  // Re-sync default on mount or if defaultWorldType changes,
+  // but we ONLY want to do this if the user hasn't generated anything yet? Wait 
+  // actually just use it as the initial state is enough.
+  // Wait, if the setting changes while the component is mounted (e.g. from a mobile setting drawer? No, it's on a different page), 
+  // then initial state is fine. But we can track changes just in case.
+  // We can just rely on the initial state for now.
 
   const setGlobalLock = useCallback((field: keyof Omit<TreasureMapConfig, 'clues'|'hoardTableType'>, value: string | number | null) => {
     dispatch({ type: 'SET_GLOBAL_LOCK', field, value });
