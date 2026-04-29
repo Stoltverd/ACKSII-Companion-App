@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AppState, Language, SpellList, SavedScroll, GlobalSpell, SavedTreasureMap } from '../types';
+import { AppState, Language, SpellList, SavedScroll, GlobalSpell, SavedTreasureMap, AppSettings } from '../types';
 import { defaultLanguages, defaultSpellLists } from '../lib/defaultData';
 
 const STORAGE_KEY = 'acks2_companion_data';
@@ -12,6 +12,7 @@ export function useDataStore() {
   const [savedScrolls, setSavedScrolls] = useState<SavedScroll[]>([]);
   const [savedTreasureMaps, setSavedTreasureMaps] = useState<SavedTreasureMap[]>([]);
   const [appMode, setAppMode] = useState<'judge' | 'player'>('judge');
+  const [settings, setSettings] = useState<AppSettings>({ autoScrollToTop: {} });
 
   // Load initially
   useEffect(() => {
@@ -46,6 +47,9 @@ export function useDataStore() {
 
         setSavedScrolls(parsed.savedScrolls || []);
         setSavedTreasureMaps(parsed.savedTreasureMaps || []);
+        if (parsed.settings) {
+          setSettings(parsed.settings);
+        }
       } catch (e) {
         console.error("Failed to parse local storage, loading defaults", e);
         setLanguages(JSON.parse(JSON.stringify(defaultLanguages)));
@@ -98,10 +102,14 @@ export function useDataStore() {
   // Save on change
   useEffect(() => {
     if (isLoaded) {
-      const stateToSave: AppState = { languages, spellLists, spells, savedScrolls, savedTreasureMaps, appMode };
+      const stateToSave: AppState = { languages, spellLists, spells, savedScrolls, savedTreasureMaps, appMode, settings };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
-  }, [languages, spellLists, spells, savedScrolls, savedTreasureMaps, appMode, isLoaded]);
+  }, [languages, spellLists, spells, savedScrolls, savedTreasureMaps, appMode, settings, isLoaded]);
+
+  const updateSettings = (updates: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...updates }));
+  };
 
   const saveScroll = (scroll: SavedScroll) => {
     setSavedScrolls(prev => [scroll, ...prev]);
@@ -169,6 +177,8 @@ export function useDataStore() {
     saveTreasureMap,
     updateTreasureMap,
     deleteTreasureMap,
-    restoreDefaults
+    restoreDefaults,
+    settings,
+    updateSettings
   };
 }

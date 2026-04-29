@@ -6,6 +6,7 @@ export interface GenerationState {
   isGenerating: boolean;
   log: string[];
   isFinished: boolean;
+  generationCount: number;
   finalOutput?: string;
   resultData?: {
     magicType: MagicType;
@@ -24,6 +25,7 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
     isGenerating: false,
     log: [],
     isFinished: false,
+    generationCount: 0
   });
 
   const [lockedMagicType, setLockedMagicType] = useState<{ isLocked: boolean, value: string }>({
@@ -42,86 +44,78 @@ export function useGenerator(languages: Language[], spellLists: SpellList[]) {
   });
 
   const startGeneration = () => {
-    setState({
-       isGenerating: true,
-       log: [],
-       isFinished: false,
-    });
+    // Generate Step 1
+    const step1 = generateStep1(lockedLevels.isLocked ? (lockedLevels.value === '' ? 1 : lockedLevels.value) : null);
     
-    setTimeout(() => {
-      let newLog: string[] = [];
+    let newLog: string[] = [];
+    let finalOutput = step1.message;
+    if (step1.isFinished && step1.message.includes('\n')) {
+      const parts = step1.message.split('\n');
+      newLog.push(parts[0]);
+      finalOutput = parts.slice(1).join('\n');
+    } else {
+      newLog.push(step1.message);
+    }
+    
+    if (step1.isFinished) {
+      let language = '';
 
-      // Step 1
-      const step1 = generateStep1(lockedLevels.isLocked ? (lockedLevels.value === '' ? 1 : lockedLevels.value) : null);
-      
-      let finalOutput = step1.message;
-      if (step1.isFinished && step1.message.includes('\n')) {
-        const parts = step1.message.split('\n');
-        newLog.push(parts[0]);
-        finalOutput = parts.slice(1).join('\n');
-      } else {
-        newLog.push(step1.message);
+      if (step1.type === 'Creature Warding Scroll' || step1.type === 'Cursed Scroll' || step1.type === 'Magic Warding Scroll') {
+        const step2_2 = generateStep2_2(languages, 'None', lockedLanguage.isLocked ? lockedLanguage.id : null);
+        newLog = newLog.concat(step2_2.logs);
+        language = step2_2.languageName;
+        finalOutput = `This sheet of papyrus is written in ${language}.\n${finalOutput}`;
       }
-      
-      if (step1.isFinished) {
-        let language = '';
 
-        if (step1.type === 'Creature Warding Scroll' || step1.type === 'Cursed Scroll' || step1.type === 'Magic Warding Scroll') {
-          const step2_2 = generateStep2_2(languages, 'None', lockedLanguage.isLocked ? lockedLanguage.id : null);
-          newLog = newLog.concat(step2_2.logs);
-          language = step2_2.languageName;
-          finalOutput = `This sheet of papyrus is written in ${language}.\n${finalOutput}`;
-        }
-
-        setState({
-          isGenerating: false,
-          log: newLog,
-          isFinished: true,
-          finalOutput,
-          resultData: language ? {
-            magicType: 'None',
-            language,
-            totalLevels: 0,
-            spells: []
-          } : undefined
-        });
-        return;
-      }
-      
-      // Step 2.1
-      const step2_1 = generateStep2_1(lockedMagicType.isLocked ? lockedMagicType.value : null, availableMagicTypes);
-      newLog.push(step2_1.message);
-
-      // Step 2.2
-      const step2_2 = generateStep2_2(languages, step2_1.type, lockedLanguage.isLocked ? lockedLanguage.id : null);
-      newLog = newLog.concat(step2_2.logs);
-
-      // Step 2.3
-      const isRitual = step1.type === 'Ritual Spell';
-      const step2_3 = generateStep2_3(step1.totalLevels, isRitual);
-      newLog = newLog.concat(step2_3.logs);
-      
-      // Step 2.4
-      const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels);
-      newLog = newLog.concat(step2_4.logs);
-
-      finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
-      
-      setState({
+      setState(prev => ({
         isGenerating: false,
         log: newLog,
         isFinished: true,
+        generationCount: prev.generationCount + 1,
         finalOutput,
-        resultData: {
-          magicType: step2_1.type as MagicType,
-          language: step2_2.languageName,
-          totalLevels: step1.totalLevels,
-          spells: step2_4.spells.map(s => ({ level: s.level, name: s.name })),
-          spellListName: step2_4.spellListName
-        }
-      });
-      
-    }, 300); // Small artificial delay to show a generation effect
+        resultData: language ? {
+          magicType: 'None',
+          language,
+          totalLevels: 0,
+          spells: []
+        } : undefined
+      }));
+      return;
+    }
+    
+    // Step 2.1
+    const step2_1 = generateStep2_1(lockedMagicType.isLocked ? lockedMagicType.value : null, availableMagicTypes);
+    newLog.push(step2_1.message);
+
+    // Step 2.2
+    const step2_2 = generateStep2_2(languages, step2_1.type, lockedLanguage.isLocked ? lockedLanguage.id : null);
+    newLog = newLog.concat(step2_2.logs);
+
+    // Step 2.3
+    const isRitual = step1.type === 'Ritual Spell';
+    const step2_3 = generateStep2_3(step1.totalLevels, isRitual);
+    newLog = newLog.concat(step2_3.logs);
+    
+    // Step 2.4
+    const step2_4 = generateStep2_4(spellLists, step2_1.type, step2_3.spellLevels);
+    newLog = newLog.concat(step2_4.logs);
+
+    finalOutput = formatFinalOutput(step2_2.languageName, step2_1.type, step1.totalLevels, step2_4.spells);
+    
+    setState(prev => ({
+      isGenerating: false,
+      log: newLog,
+      isFinished: true,
+      generationCount: prev.generationCount + 1,
+      finalOutput,
+      resultData: {
+        magicType: step2_1.type as MagicType,
+        language: step2_2.languageName,
+        totalLevels: step1.totalLevels,
+        spells: step2_4.spells.map(s => ({ level: s.level, name: s.name })),
+        spellListName: step2_4.spellListName
+      }
+    }));
   };
 
   return {

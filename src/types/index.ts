@@ -70,6 +70,12 @@ export interface SavedTreasureMap {
   note?: string;
 }
 
+export interface AppSettings {
+  autoScrollToTop: {
+    [generatorId: string]: boolean;
+  };
+}
+
 export interface AppState {
   appMode?: 'judge' | 'player';
   languages: Language[];
@@ -77,4 +83,5 @@ export interface AppState {
   spells: GlobalSpell[];
   savedScrolls: SavedScroll[];
   savedTreasureMaps?: SavedTreasureMap[];
+  settings?: AppSettings;
 }

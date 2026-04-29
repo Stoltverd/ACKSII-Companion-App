@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, Save, ChevronDown, ChevronRight, Dices } from 'lucide-react';
 import { useAppContext } from '../AppContext';
 import { useConfirm } from '../hooks/useConfirm';
@@ -10,10 +10,18 @@ import {
 import { HoardTableType } from '../types';
 
 export default function TreasureMapView() {
-  const { saveTreasureMap } = useAppContext();
+  const { saveTreasureMap, settings } = useAppContext();
   const { promptWithNote, alert: showAlert } = useConfirm();
   const { state, setGlobalLock, setHoardTable, setClueLock, generate, reset } = useTreasureMapGenerator();
-  
+
+  useEffect(() => {
+    if (state.isFinished && settings?.autoScrollToTop?.['treasureMap']) {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 10);
+    }
+  }, [state.isFinished, state.generationCount, settings?.autoScrollToTop]);
+
   const [expandedClues, setExpandedClues] = useState<boolean[]>([true, false, false]);
 
   const toggleClue = (index: number) => {

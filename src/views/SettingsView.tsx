@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useAppContext } from '../AppContext';
 import { useConfirm } from '../hooks/useConfirm';
-import { Sun, Moon, RotateCcw, PaintRoller, BellRing } from 'lucide-react';
+import { Sun, Moon, RotateCcw, PaintRoller, BellRing, MonitorSmartphone, ChevronUp, ChevronDown, ChevronRight } from 'lucide-react';
 
 export default function SettingsView() {
   const { theme, toggleTheme } = useTheme();
-  const { restoreDefaults } = useAppContext();
+  const { restoreDefaults, settings, updateSettings } = useAppContext();
   const { confirm, alert: showAlert } = useConfirm();
+  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
 
   const handleRestoreDefaults = async () => {
     const isConfirmed = await confirm({
@@ -66,6 +67,59 @@ export default function SettingsView() {
                 {theme === 'dark' ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-blue-600" />}
               </button>
             </div>
+          </section>
+
+          {/* Generator Settings */}
+          <section className="pt-4 border-t border-app lg:hidden">
+            <button 
+              onClick={() => setIsMobileSettingsOpen(!isMobileSettingsOpen)}
+              className="w-full text-left flex items-center justify-between group"
+            >
+              <h3 className="text-sm font-bold text-muted uppercase tracking-wider flex items-center gap-2 group-hover:text-main transition-colors">
+                <MonitorSmartphone size={16} /> Mobile Experience
+              </h3>
+              {isMobileSettingsOpen ? (
+                <ChevronDown size={18} className="text-muted group-hover:text-main transition-colors" />
+              ) : (
+                <ChevronRight size={18} className="text-muted group-hover:text-main transition-colors" />
+              )}
+            </button>
+            
+            {isMobileSettingsOpen && (
+              <div className="space-y-4 mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div>
+                  <p className="font-medium text-main flex items-center gap-1"><ChevronUp size={16} className="text-muted" /> Auto-Scroll to Top</p>
+                  <p className="text-sm text-muted">Automatically scroll to the top of the generator screen after generation finishes. Helpful on mobile to see the top of your generated results immediately.</p>
+                </div>
+                
+                <div className="grid gap-2">
+                  {[
+                    { id: 'scroll', name: 'Scroll Generator' },
+                    { id: 'treasureMap', name: 'Treasure Map Generator' }
+                  ].map(gen => {
+                    const isEnabled = settings?.autoScrollToTop?.[gen.id] ?? false;
+                    return (
+                      <label key={gen.id} className="flex items-center gap-3 p-3 bg-app border border-app rounded-lg cursor-pointer hover:bg-surface transition-colors w-full">
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 text-accent border-app rounded focus:ring-accent"
+                          checked={isEnabled}
+                          onChange={(e) => {
+                            updateSettings({
+                              autoScrollToTop: {
+                                ...(settings?.autoScrollToTop || {}),
+                                [gen.id]: e.target.checked
+                              }
+                            });
+                          }}
+                        />
+                        <span className="text-sm font-medium text-main">{gen.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Data Management Settings */}

@@ -6,10 +6,18 @@ import { Lock, Unlock, Save } from 'lucide-react';
 import { MagicType } from '../types';
 
 export default function GeneratorView() {
-  const { languages, spellLists, saveScroll } = useAppContext();
+  const { languages, spellLists, saveScroll, settings } = useAppContext();
   const { state, lockedMagicType, setLockedMagicType, lockedLanguage, setLockedLanguage, lockedLevels, setLockedLevels, startGeneration } = useGenerator(languages, spellLists);
   const { alert: showAlert, promptWithNote } = useConfirm();
   
+  useEffect(() => {
+    if (state.isFinished && settings?.autoScrollToTop?.['scroll']) {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 10);
+    }
+  }, [state.isFinished, state.generationCount, settings?.autoScrollToTop]);
+
   useEffect(() => {
     // If not locked or ID is invalid, pick default to avoid empty selects
     if (!lockedLanguage.id && languages.length > 0) {

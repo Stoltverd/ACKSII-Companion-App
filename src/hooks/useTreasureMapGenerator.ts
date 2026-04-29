@@ -6,6 +6,7 @@ export interface TreasureMapState {
   config: TreasureMapConfig;
   result: GenerationResult | null;
   isFinished: boolean;
+  generationCount: number;
 }
 
 type Action =
@@ -32,7 +33,8 @@ const initialState: TreasureMapState = {
     clues: initialCluesConfig()
   },
   result: null,
-  isFinished: false
+  isFinished: false,
+  generationCount: 0
 };
 
 function reducer(state: TreasureMapState, action: Action): TreasureMapState {
@@ -98,7 +100,8 @@ function reducer(state: TreasureMapState, action: Action): TreasureMapState {
       return {
         ...state,
         result,
-        isFinished: true // Mark generation step completed
+        isFinished: true, // Mark generation step completed
+        generationCount: state.generationCount + 1
       };
     }
     case 'RESET':
@@ -106,7 +109,8 @@ function reducer(state: TreasureMapState, action: Action): TreasureMapState {
          ...initialState,
          config: { ...state.config }, // We retain their locks on reset, but clear the logs/results
          result: null,
-         isFinished: false
+         isFinished: false,
+         generationCount: 0
       };
     default:
       return state;
