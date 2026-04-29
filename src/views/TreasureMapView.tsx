@@ -123,17 +123,17 @@ export default function TreasureMapView() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="mb-4">
+    <div className="space-y-6 flex flex-col flex-1">
+      <header className="mb-4 shrink-0">
         <h2 className="font-serif text-3xl mb-2 text-main font-semibold">Treasure Map Build</h2>
         <p className="text-muted text-sm">Generate treasure maps quickly and transparently using the ACKS II rules.</p>
       </header>
 
-      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${!state.isFinished ? 'place-items-center' : ''}`}>
+      <div className={`flex flex-col flex-1 ${state.isFinished || state.result?.log?.length ? 'lg:flex-row lg:h-[calc(100vh-14rem)]' : 'items-center'} gap-8`}>
         
         {/* Control Area */}
-        <div className={`space-y-6 flex flex-col w-full ${state.isFinished ? 'lg:col-span-5' : 'lg:col-span-12 lg:max-w-2xl'}`}>
-          <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col space-y-6 flex-1">
+        <div className={`flex flex-col space-y-6 w-full ${state.isFinished || state.result?.log?.length ? 'lg:w-1/2 lg:h-full lg:overflow-y-auto lg:pr-2' : 'max-w-2xl'} pb-4 lg:pb-0`}>
+          <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col space-y-6 flex-1 shrink-0">
             <h3 className="font-serif text-xl font-medium border-b border-app pb-2">Map Configuration</h3>
 
             <div className="space-y-6">
@@ -207,37 +207,38 @@ export default function TreasureMapView() {
           </div>
 
           <button 
-            className="w-full bg-accent hover:bg-accent/90 text-white font-medium py-3 px-6 rounded-xl shadow-sm transition-all focus:ring-2 focus:ring-accent focus:ring-offset-2 flex items-center justify-center gap-2 active:scale-[0.98]"
+            className="w-full bg-accent hover:bg-accent/90 text-white font-medium py-3 px-6 rounded-xl shadow-sm transition-all focus:outline-none flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
             onClick={generate}
             disabled={!state.isFinished && state.result?.log.length > 0}
           >
             <Dices className="w-5 h-5"/> {(!state.isFinished && state.result?.log.length > 0) ? 'Generating...' : 'Generate Treasure Map'}
           </button>
 
-          {state.isFinished && state.result?.finalSummary && (
-             <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col">
-               <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50">Map Summary</h3>
-               <div className="bg-[#fcfaf2] dark:bg-[#202522] text-emerald-900 dark:text-emerald-100 p-4 lg:p-6 rounded-xl font-serif text-sm lg:text-base border border-emerald-200 dark:border-emerald-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
-                 {state.result.finalSummary}
-               </div>
-               <button 
-                 onClick={handleSave}
-                 className="mt-6 w-full py-2.5 bg-surface border-2 border-accent text-accent rounded-xl font-medium shadow-sm hover:bg-accent hover:text-white transition-all flex items-center justify-center space-x-2"
-               >
-                 <Save size={18} />
-                 <span>Save to Collection</span>
-               </button>
-             </div>
-          )}
         </div>
 
         {/* Result Area */}
-        {state.isFinished && (
-          <div className="lg:col-span-7">
-            <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col">
+        {(state.isFinished || (state.result?.log && state.result.log.length > 0)) && (
+          <div className="w-full lg:w-1/2 lg:h-full lg:overflow-y-auto lg:pr-2 flex flex-col space-y-6">
+            {state.isFinished && state.result?.finalSummary && (
+               <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col shrink-0">
+                 <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50">Map Summary</h3>
+                 <div className="bg-[#fcfaf2] dark:bg-[#202522] text-emerald-900 dark:text-emerald-100 p-4 lg:p-6 rounded-xl font-serif text-sm lg:text-base border border-emerald-200 dark:border-emerald-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
+                   {state.result.finalSummary}
+                 </div>
+                 <button 
+                   onClick={handleSave}
+                   className="mt-6 w-full py-2.5 bg-surface border-2 border-accent text-accent rounded-xl font-medium shadow-sm hover:bg-accent hover:text-white transition-all flex items-center justify-center space-x-2"
+                 >
+                   <Save size={18} />
+                   <span>Save to Collection</span>
+                 </button>
+               </div>
+            )}
+            
+            <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col flex-1 shrink-0">
               <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4">Transparency Log</h3>
 
-              <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+              <div className="space-y-4 flex-1">
                 {state.result?.log.map((entry, idx) => (
                   <div key={idx} className="p-3 bg-app rounded-lg border border-app text-sm leading-relaxed text-main font-mono">
                     <span className="text-accent opacity-50 select-none mr-2">&gt;</span>

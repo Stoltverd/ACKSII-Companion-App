@@ -50,9 +50,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [isMenuOpen]);
 
   return (
-    <div className="min-h-screen bg-app text-main font-sans selection:bg-accent selection:text-white pb-12 transition-colors duration-300">
+    <div className="min-h-screen bg-app text-main font-sans selection:bg-accent selection:text-white transition-colors duration-300 flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-surface/80 backdrop-blur-md border-b border-app shadow-sm h-16 flex items-center px-4 justify-between">
+      <header className="sticky top-0 z-30 bg-surface/80 backdrop-blur-md border-b border-app shadow-sm h-16 flex items-center px-4 justify-between shrink-0">
         <div className="flex items-center">
           <button 
             onClick={() => setIsMenuOpen(true)}
@@ -158,7 +158,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 w-full max-w-5xl mx-auto mt-4 px-4 sm:px-6 lg:px-8 pb-4 lg:pb-8 flex flex-col">
         {children}
       </main>
     </div>

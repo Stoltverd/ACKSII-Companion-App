@@ -55,17 +55,17 @@ export default function GeneratorView() {
   const magicTypeCount = availableMagicTypes.length;
 
   return (
-    <div className="space-y-6">
-      <header className="mb-4">
+    <div className="space-y-6 flex flex-col flex-1">
+      <header className="mb-4 shrink-0">
         <h2 className="font-serif text-3xl mb-2 text-main font-semibold">Scroll Generation</h2>
         <p className="text-muted text-sm">Generate magic scrolls quickly and transparently using the ACKS II rules.</p>
       </header>
 
-      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${state.log.length === 0 ? 'place-items-center' : ''}`}>
+      <div className={`flex flex-col flex-1 ${state.log.length > 0 ? 'lg:flex-row lg:h-[calc(100vh-14rem)]' : 'items-center'} gap-8`}>
         
         {/* Control Area */}
-        <div className={`space-y-6 flex flex-col w-full ${state.log.length > 0 ? 'lg:col-span-5' : 'lg:col-span-12 lg:max-w-2xl'}`}>
-          <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col space-y-6 flex-1">
+        <div className={`flex flex-col space-y-6 w-full ${state.log.length > 0 ? 'lg:w-1/2 lg:h-full lg:overflow-y-auto lg:pr-2' : 'max-w-2xl'} pb-4 lg:pb-0`}>
+          <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col space-y-6 flex-1 shrink-0">
             <h3 className="font-serif text-xl font-medium border-b border-app pb-2">Generation Controls</h3>
             
             <div className="space-y-4 flex-1">
@@ -223,30 +223,31 @@ export default function GeneratorView() {
             </button>
           </div>
           
-          {state.isFinished && state.finalOutput && (
-             <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col">
-               <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/50">Generation Complete</h3>
-               <div className="bg-yellow-50 dark:bg-[#2a2820] text-amber-900 dark:text-amber-100 p-4 lg:p-6 rounded-xl font-serif text-sm lg:text-base xl:text-lg border border-yellow-200 dark:border-yellow-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
-                  {state.finalOutput}
-               </div>
-               <button 
-                 onClick={handleSave}
-                 className="mt-6 w-full py-2.5 bg-surface border-2 border-accent text-accent rounded-xl font-medium shadow-sm hover:bg-accent hover:text-white transition-all flex items-center justify-center space-x-2"
-               >
-                 <Save size={18} />
-                 <span>Save to Collection</span>
-               </button>
-             </div>
-          )}
         </div>
 
-        {/* Result Log */}
+        {/* Result Area */}
         {state.log.length > 0 && (
-          <div className="lg:col-span-7">
-            <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col">
+          <div className="w-full lg:w-1/2 lg:h-full lg:overflow-y-auto lg:pr-2 flex flex-col space-y-6">
+            {state.isFinished && state.finalOutput && (
+               <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col shrink-0">
+                 <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/50">Generation Complete</h3>
+                 <div className="bg-yellow-50 dark:bg-[#2a2820] text-amber-900 dark:text-amber-100 p-4 lg:p-6 rounded-xl font-serif text-sm lg:text-base xl:text-lg border border-yellow-200 dark:border-yellow-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
+                    {state.finalOutput}
+                 </div>
+                 <button 
+                   onClick={handleSave}
+                   className="mt-6 w-full py-2.5 bg-surface border-2 border-accent text-accent rounded-xl font-medium shadow-sm hover:bg-accent hover:text-white transition-all flex items-center justify-center space-x-2"
+                 >
+                   <Save size={18} />
+                   <span>Save to Collection</span>
+                 </button>
+               </div>
+            )}
+            
+            <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col flex-1 shrink-0">
               <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4">Transparency Log</h3>
               
-              <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+              <div className="space-y-4 flex-1">
                 {state.log.map((entry, idx) => (
                   <div key={idx} className="p-3 bg-app rounded-lg border border-app text-sm leading-relaxed text-main font-mono">
                     {entry}
