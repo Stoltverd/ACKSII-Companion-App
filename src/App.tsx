@@ -7,6 +7,7 @@ import Layout from './components/Layout';
 import GeneratorView from './views/GeneratorView';
 import SavedItemsView from './views/SavedItemsView';
 import SettingsView from './views/SettingsView';
+import TreasureMapView from './views/TreasureMapView';
 
 // Nested Customization Views
 import DataManagementHub from './views/customization/DataManagementHub';
@@ -16,13 +17,6 @@ import GlobalSpellLibrary from './views/GlobalSpellLibrary'; // Using the existi
 import ImportExportManager from './views/customization/ImportExportManager';
 
 // ... Placeholder views stay the same
-const TreasureMapPlaceholder = () => (
-  <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-app rounded-lg bg-surface">
-    <h2 className="text-2xl font-serif font-bold text-accent mb-4">Treasure Map Generator</h2>
-    <p className="text-muted">This feature is currently under development (Phase 2).</p>
-  </div>
-);
-
 const PlayerPlaceholder = ({ title }: { title: string }) => (
   <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-app rounded-lg bg-surface">
     <h2 className="text-2xl font-serif font-bold text-accent mb-4">{title}</h2>
@@ -68,7 +62,7 @@ export default function App() {
               </Route>
               
               <Route path="/saved" element={<SavedItemsView />} />
-              <Route path="/treasure-map" element={<TreasureMapPlaceholder />} />
+              <Route path="/treasure-map" element={<TreasureMapView />} />
               <Route path="/player/characters" element={<PlayerPlaceholder title="Character Manager" />} />
               <Route path="/player/inventory" element={<PlayerPlaceholder title="Inventory Tracker" />} />
               <Route path="/settings" element={<SettingsView />} />
