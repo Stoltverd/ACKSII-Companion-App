@@ -1,7 +1,8 @@
 import { HoardTableType, TreasureMapClue } from '../types';
 import {
-  TREASURE_TYPES, MAP_LOCATIONS, CLUE_DETAILS, CLUE_CONTENTS,
-  CLUE_OBSCURITIES, CLUE_CONCEALMENTS, CLUE_CODES, HOARD_VALUES
+  TREASURE_TYPES, MAP_LOCATIONS, CLUE_COUNT_ROLLS, CLUE_DETAILS, CLUE_CONTENTS,
+  CLUE_OBSCURITIES, CLUE_CONCEALMENTS, CLUE_CODES, HOARD_VALUES,
+  CLUE_CONCEALMENT_DESCRIPTIONS, CLUE_CODE_DESCRIPTIONS
 } from '../data/treasureMapData';
 
 export interface ClueConfig {
@@ -61,13 +62,12 @@ export function generateTreasureMap(config: TreasureMapConfig): GenerationResult
 
   // --- Step 2.2: Number of Clues ---
   if (config.numClues !== null) {
-    // Edge Case Mitigation: Strict Limit Clamping (Max 3)
-    result.numClues = Math.max(1, Math.min(3, config.numClues));
+    // Edge Case Mitigation: Strict Limit Clamping (Max 3, Min 0)
+    result.numClues = Math.max(0, Math.min(3, config.numClues));
     log.push(`Step two - roll 2: Determine Number of Clues, you manually selected; ${result.numClues} Clues.`);
   } else {
     const roll = rand(6);
-    // Standard tables typically group 1-2 = 1, 3-4 = 2, 5-6 = 3
-    const num = Math.ceil(roll / 2);
+    const num = CLUE_COUNT_ROLLS[roll - 1];
     result.numClues = num;
     log.push(`Step two - roll 2: Determine Number of Clues, you rolled ${roll}; ${num} Clues.`);
   }
@@ -118,8 +118,8 @@ export function generateTreasureMap(config: TreasureMapConfig): GenerationResult
     log.push(`Clue #${clueNum} Detail: ${detailStr}. Clue #${clueNum} Content: ${contentStr}. Clue #${clueNum} Obscurity: ${obscStr}.`);
 
     // Dependent Sub-Roll Logic & Orphaned Lock Mitigation
-    const isCoded = clueResult.obscurity === 'Coded' || clueResult.obscurity === 'Coded and Concealed';
-    const isConcealed = clueResult.obscurity === 'Concealed' || clueResult.obscurity === 'Coded and Concealed';
+    const isCoded = clueResult.obscurity === 'Coded';
+    const isConcealed = clueResult.obscurity === 'Concealed';
 
     if (isConcealed) {
       if (clueConfig.concealment) {
@@ -162,27 +162,54 @@ export function generateTreasureMap(config: TreasureMapConfig): GenerationResult
   // Clean string formatter for grammar concerns (e.g. "a few miles away" vs "in a nearby location")
   const locRaw = result.location.toLowerCase();
   let locPhrase = '';
-  if (locRaw.includes('nearby') || locRaw.includes('far away')) locPhrase = `in a ${locRaw} location`;
+  if (locRaw.includes('nearby') || locRaw.includes('distant') || locRaw === 'adjacent') locPhrase = `in a ${locRaw} location`;
   else if (locRaw.startsWith('in a ') || locRaw.startsWith('a ')) locPhrase = locRaw;
-  else locPhrase = `in a ${locRaw} location`;
+  else locPhrase = `in an ${locRaw} location`;
   
-  const cluesWord = result.numClues > 1 ? 'Clues' : 'Clue';
+  const cluesWord = result.numClues === 1 ? 'Clue' : 'Clues';
 
-  finalLines.push(`This Treasure Map leads to a Treasure Type ${result.treasureType} Hoard (Average Value: ${value}) ${locPhrase}. The map contains ${result.numClues} ${cluesWord}:`);
-  finalLines.push(''); // Add a blank spacing line
+  finalLines.push(`This Treasure Map leads to a Treasure Type ${result.treasureType} Hoard (Average Value: ${value}) ${locPhrase}. The map contains ${result.numClues} ${cluesWord}${result.numClues > 0 ? ':' : '.'}`);
+  
+  if (result.numClues > 0) {
+    finalLines.push(''); // Add a blank spacing line
+  }
 
   result.clues.forEach((clue, idx) => {
     let clueStr = `* Clue #${idx + 1}: ${clue.content}. The clue's details are ${clue.detail}. This clue is ${clue.obscurity}`;
-    if (clue.code && clue.concealment) {
-        clueStr += `, the type of code is: ${clue.code}, and the type of concealment is: ${clue.concealment}.`;
-    } else if (clue.code) {
-        clueStr += `, the type of code is: ${clue.code}.`;
-    } else if (clue.concealment) {
-        clueStr += `, the type of concealment is: ${clue.concealment}.`;
+    let desc = '';
+
+    if (clue.obscurity === 'Concealed' && clue.concealment) {
+      desc = CLUE_CONCEALMENT_DESCRIPTIONS[clue.concealment] || '';
+      
+      // Resolve sub-rolls for concealments
+      if (clue.concealment === 'Moon Ink') {
+        const moons = ['full', 'full', 'gibbous', 'gibbous', 'half', 'half', 'crescent', 'crescent', 'new', 'new'];
+        desc = desc.replace('(ROLL_MOON)', `(Moon type: ${moons[rand(10) - 1]})`);
+      } else if (clue.concealment === 'Activated Illusion') {
+        const illusions = ['visual', 'visual', 'visual', 'visual', 'auditory', 'auditory'];
+        desc = desc.replace('(ROLL_ILLUSION)', `(Illusion type: ${illusions[rand(6) - 1]})`);
+      } else if (clue.concealment === 'Artwork') {
+        const proficiencies = ['Alchemy', 'Art/Craft', 'Collegiate Wizardry', 'Knowledge (astrology) or Navigation', 'Knowledge (natural philosophy) or Naturalism', 'Labor', 'Military Strategy', 'Performance', 'Profession', 'Signaling', 'Streetwise', 'Theology'];
+        desc = desc.replace('(ROLL_ARTWORK)', `(Associated proficiency: ${proficiencies[rand(12) - 1]})`);
+      }
+      
+      clueStr += `, the type of concealment is: ${clue.concealment}. ${desc}`;
+
+    } else if (clue.obscurity === 'Coded' && clue.code) {
+      desc = CLUE_CODE_DESCRIPTIONS[clue.code] || '';
+      
+      // Resolve sub-rolls for codes
+      if (clue.code === 'Special Knowledge') {
+        const knowledgeTypes = ['Alchemy', 'Art/Craft', 'Collegiate Wizardry', 'Knowledge (history)', 'Labor', 'Profession', 'Profession', 'Theology', 'Theology', 'knowledge common among members of a certain race', 'knowledge common among members of a certain race', 'knowledge common among members of a certain race'];
+        desc = desc.replace('(ROLL_KNOWLEDGE)', `(Required knowledge: ${knowledgeTypes[rand(12) - 1]})`);
+      }
+
+      clueStr += `, the type of code is: ${clue.code}. ${desc}`;
     } else {
         clueStr += `.`;
     }
-    finalLines.push(clueStr);
+    
+    finalLines.push(clueStr.trim());
   });
 
   result.finalSummary = finalLines.join('\n');

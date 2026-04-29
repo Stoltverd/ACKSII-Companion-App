@@ -37,14 +37,33 @@ const initialState: TreasureMapState = {
 
 function reducer(state: TreasureMapState, action: Action): TreasureMapState {
   switch (action.type) {
-    case 'SET_GLOBAL_LOCK':
+    case 'SET_GLOBAL_LOCK': {
+      const newConfig = {
+        ...state.config,
+        [action.field]: action.value
+      };
+
+      if (action.field === 'numClues' && action.value !== null) {
+        const numClues = action.value as number;
+        // If user reduces number of clues, clear locks on clues that will no longer be generated
+        const newClues = [...newConfig.clues];
+        for (let i = numClues; i < 3; i++) {
+          newClues[i] = {
+            detail: null,
+            content: null,
+            obscurity: null,
+            code: null,
+            concealment: null
+          };
+        }
+        newConfig.clues = newClues;
+      }
+
       return {
         ...state,
-        config: {
-          ...state.config,
-          [action.field]: action.value
-        }
+        config: newConfig
       };
+    }
     case 'SET_HOARD_TABLE':
       return {
          ...state,
@@ -56,12 +75,22 @@ function reducer(state: TreasureMapState, action: Action): TreasureMapState {
         ...newClues[action.index],
         [action.field]: action.value
       };
+      
+      const newConfig = { ...state.config, clues: newClues };
+
+      // Calculate min clues required by constraints
+      const minClues = newClues.reduce((maxIdx, clue, idx) => {
+        return Object.values(clue).some(v => v !== null) ? Math.max(maxIdx, idx + 1) : maxIdx;
+      }, 0);
+
+      // If we have constraints, make sure numClues is at least minClues
+      if (minClues > 0 && (newConfig.numClues === null || newConfig.numClues < minClues)) {
+        newConfig.numClues = minClues;
+      }
+
       return {
         ...state,
-        config: {
-          ...state.config,
-          clues: newClues
-        }
+        config: newConfig
       };
     }
     case 'GENERATE': {

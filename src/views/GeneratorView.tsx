@@ -61,10 +61,10 @@ export default function GeneratorView() {
         <p className="text-muted text-sm">Generate magic scrolls quickly and transparently using the ACKS II rules.</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${state.log.length === 0 ? 'place-items-center' : ''}`}>
         
         {/* Control Area */}
-        <div className="lg:col-span-5 space-y-6 flex flex-col">
+        <div className={`space-y-6 flex flex-col w-full ${state.log.length > 0 ? 'lg:col-span-5' : 'lg:col-span-12 lg:max-w-2xl'}`}>
           <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col space-y-6 flex-1">
             <h3 className="font-serif text-xl font-medium border-b border-app pb-2">Generation Controls</h3>
             
@@ -241,15 +241,11 @@ export default function GeneratorView() {
         </div>
 
         {/* Result Log */}
-        <div className="lg:col-span-7">
-          <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col">
-            <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4">Transparency Log</h3>
-            
-            {state.log.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-muted font-serif italic text-lg opacity-50">
-                Awaiting generation...
-              </div>
-            ) : (
+        {state.log.length > 0 && (
+          <div className="lg:col-span-7">
+            <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm min-h-[400px] flex flex-col">
+              <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4">Transparency Log</h3>
+              
               <div className="space-y-4 flex-1 overflow-y-auto pr-2">
                 {state.log.map((entry, idx) => (
                   <div key={idx} className="p-3 bg-app rounded-lg border border-app text-sm leading-relaxed text-main font-mono">
@@ -257,9 +253,9 @@ export default function GeneratorView() {
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

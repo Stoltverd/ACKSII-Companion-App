@@ -19,6 +19,7 @@ interface PromptOptions {
   validate?: (value: string) => string | null;
   withNote?: boolean;
   defaultNote?: string;
+  notePlaceholder?: string;
 }
 
 interface ConfirmContextType {
@@ -146,7 +147,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                       <textarea
                         value={promptNoteValue}
                         onChange={(e) => setPromptNoteValue(e.target.value)}
-                        placeholder="Add notes about who the owner is, where the scroll was found, or what curse it contains..."
+                        placeholder={(modalState.options as PromptOptions).notePlaceholder || "Add notes about who the owner is, where the scroll was found, or what curse it contains..."}
                         className="w-full px-3 py-2 bg-app border border-app rounded-lg text-sm text-main outline-none focus:border-accent font-medium min-h-[80px] resize-y"
                       />
                     </div>
