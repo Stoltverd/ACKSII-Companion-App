@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useAppContext } from '../../AppContext';
 import { useConfirm } from '../../hooks/useConfirm';
 import { FileDown, FileUp, X } from 'lucide-react';
-import { Language, SpellList } from '../../types';
+import { Language, SpellList, GlobalSpell } from '../../types';
 import * as yaml from 'js-yaml';
 
 export default function ImportExportManager() {
