@@ -226,7 +226,7 @@ export default function GeneratorView() {
           {state.isFinished && state.finalOutput && (
              <div className="bg-surface border border-app rounded-2xl p-6 shadow-sm flex flex-col">
                <h3 className="font-serif text-xl font-medium border-b border-app pb-2 mb-4 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/50">Generation Complete</h3>
-               <div className="bg-yellow-50 dark:bg-[#2a2820] text-amber-900 dark:text-amber-100 p-4 rounded-xl font-serif text-sm border border-yellow-200 dark:border-yellow-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
+               <div className="bg-yellow-50 dark:bg-[#2a2820] text-amber-900 dark:text-amber-100 p-4 lg:p-6 rounded-xl font-serif text-sm lg:text-base xl:text-lg border border-yellow-200 dark:border-yellow-900/50 whitespace-pre-wrap leading-relaxed shadow-inner">
                   {state.finalOutput}
                </div>
                <button 
