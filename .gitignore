@@ -12,3 +12,8 @@ public/android-chrome-*.png
 public/apple-touch-icon.png
 public/favicon-*.png
 public/favicon.ico
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
